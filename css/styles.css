@@ -1,0 +1,147 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #ededed;
+    color: #333;
+}
+
+/* Cabecera / Barra superior tipo tienda */
+header {
+    background-color: #ffffff;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.2rem;
+    color: #e67e22;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+header nav a {
+    color: #333;
+    text-decoration: none;
+    margin-left: 25px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+header nav a:hover {
+    color: #e67e22;
+}
+
+/* Contenedor principal */
+main {
+    max-width: 1200px;
+    margin: 2.5rem auto;
+    padding: 0 2rem;
+}
+
+.titulo-seccion {
+    font-size: 1.1rem;
+    color: #e67e22;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5px;
+}
+
+.titulo-seccion span {
+    color: #555;
+    font-weight: normal;
+    font-size: 0.95rem;
+    margin-left: 10px;
+}
+
+/* Cuadrícula de productos (Grid de 4 columnas limpio) */
+.grid-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 25px;
+}
+
+/* Tarjeta de producto minimalista estilo referencia */
+.tarjeta-producto {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+/* Efecto de tarjeta seleccionada o con hover sutil (borde naranja como en la foto) */
+.tarjeta-producto:hover, .tarjeta-producto.destacada {
+    border-color: #ff6b4a;
+    box-shadow: 0 4px 12px rgba(255, 107, 74, 0.15);
+}
+
+.tarjeta-producto h3 {
+    font-size: 0.85rem;
+    color: #222;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 15px;
+    min-height: 2.6em; /* Para alinear títulos de 1 o 2 líneas */
+}
+
+/* Contenedor de la imagen con fondo blanco interno */
+.contenedor-imagen {
+    background: #ffffff;
+    border: 1px solid #f2f2f2;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+}
+
+.tarjeta-producto img {
+    max-width: 100%;
+    max-height: 130px;
+    object-fit: contain;
+}
+
+/* Precio opcional elegante */
+.precio {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+/* Botón naranja clásico ("MÁS INFO" o "AÑADIR") */
+.btn-comprar {
+    background-color: #ff6b4a;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 10px 0;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-comprar:hover {
+    background-color: #e85a38;
+}

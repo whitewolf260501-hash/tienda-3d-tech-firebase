@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda - 3D y Tecnología</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Cabecera -->
+    <header>
+        <h1>Impresiones 3D & Tech</h1>
+        <nav>
+        <a href="index.html">Impresiones 3D</a>
+        <a href="tecnologia.html">Tecnología</a>
+        <a href="carrito.html">🛒 Carrito (<span id="contador-carrito">0</span>)</a></nav>
+    </header>
+
+    <!-- Contenedor Principal del Catálogo -->
+    <main>
+        <div class="titulo-seccion">
+            Catálogo <span>| Productos 3D y Tecnología</span>
+        </div>
+        
+        <!-- Aquí JavaScript inyectará las tarjetas de productos desde Firebase -->
+        <div id="contenedor-productos" class="grid-productos">
+            <p>Cargando productos...</p>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script type="module" src="src/app.js"></script>
+</body>
+</html>

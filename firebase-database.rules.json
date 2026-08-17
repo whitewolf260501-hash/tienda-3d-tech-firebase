@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "productos": {
+      ".read": true,
+      ".write": false
+    }
+  }
+}

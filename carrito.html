@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Mi Tienda 3D & Tech</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Impresiones 3D & Tech</h1>
+        <nav>
+            <a href="index.html">Impresiones 3D</a>
+            <a href="tecnologia.html">Tecnología</a>
+            <a href="carrito.html" style="color: #ff6b4a;">🛒 Carrito (<span id="contador-carrito">0</span>)</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="titulo-seccion">
+            Finalizar <span>| Tu Carrito de Compras</span>
+        </div>
+
+        <div id="contenedor-carrito" style="margin-bottom: 30px;">
+            <!-- Aquí se cargan los productos -->
+        </div>
+
+        <!-- Formulario de datos -->
+        <div id="seccion-checkout" style="background: white; padding: 25px; border-radius: 6px; border: 1px solid #ddd; max-width: 600px; display: none;">
+            <h3>Datos de Contacto para el Envío</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                <div>
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: bold;">Nombre Completo:</label>
+                    <input type="text" id="cliente-nombre" placeholder="Ej: Manuel Crisóstomo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: bold;">Teléfono / WhatsApp:</label>
+                    <input type="tel" id="cliente-telefono" placeholder="Ej: +56912345678" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: bold;">Correo Electrónico:</label>
+                    <input type="email" id="cliente-correo" placeholder="correo@ejemplo.com" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: bold;">Dirección de Despacho o Nota:</label>
+                    <textarea id="cliente-direccion" rows="3" placeholder="Calle, número, comuna u observaciones..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" id="btn-whatsapp" style="flex: 1; background: #25d366; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                        📲 Enviar por WhatsApp
+                    </button>
+                    <button type="button" id="btn-correo" style="flex: 1; background: #2980b9; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                        📧 Enviar por Correo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="src/cart.js"></script>
+</body>
+</html>
