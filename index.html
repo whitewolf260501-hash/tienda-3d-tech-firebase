@@ -10,7 +10,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Mi Tienda - Impresiones 3D</title>
+    <title>
+        Impresiones 3D | Mi Tienda
+    </title>
 
     <link
         rel="stylesheet"
@@ -19,26 +21,13 @@
 
 </head>
 
-
-<!--
-    IMPORTANTE:
-
-    Esta página solamente mostrará productos
-    cuya categoría sea "3D".
--->
-<body data-categoria="3D">
-
-
-    <!-- =====================================================
-         CABECERA
-    ====================================================== -->
+<body>
 
     <header>
 
         <h1>
-            🖨️ Impresiones 3D & Tech
+            Impresiones 3D & Tech
         </h1>
-
 
         <nav>
 
@@ -49,47 +38,24 @@
                 🖨️ Impresiones 3D
             </a>
 
-
-            <a
-                href="tecnologia.html"
-            >
+            <a href="tecnologia.html">
                 💻 Tecnología
             </a>
 
-
-            <a
-                href="carrito.html"
-            >
+            <a href="carrito.html">
                 🛒 Carrito
                 (<span id="contador-carrito">0</span>)
-            </a>
-
-
-            <!-- Acceso al área privada -->
-
-            <a
-                href="login.html"
-            >
-                🔐 Administración
             </a>
 
         </nav>
 
     </header>
 
-
-    <!-- =====================================================
-         CONTENIDO PRINCIPAL
-    ====================================================== -->
-
     <main>
-
 
         <div class="titulo-seccion">
 
-            <strong>
-                CATÁLOGO
-            </strong>
+            Catálogo
 
             <span>
                 | Impresiones 3D
@@ -97,35 +63,23 @@
 
         </div>
 
-
-        <!--
-            app.js cargará aquí los productos
-        -->
-
         <div
             id="contenedor-productos"
             class="grid-productos"
         >
 
-            <p>
-                Cargando productos...
+            <p class="cargando">
+                Cargando productos 3D...
             </p>
 
         </div>
 
-
     </main>
-
-
-    <!-- =====================================================
-         JAVASCRIPT
-    ====================================================== -->
 
     <script
         type="module"
         src="src/app.js"
     ></script>
-
 
 </body>
 

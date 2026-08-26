@@ -1,48 +1,68 @@
 // ============================================================
 // app.js
-// CATÁLOGO PÚBLICO
-//
-// NO UTILIZA FIREBASE.
-//
-// Los productos se almacenan localmente mediante:
-//
-// localStorage
-//
-// Además utiliza productos.js como catálogo inicial.
 // ============================================================
-
+// CATÁLOGO PÚBLICO - IMPRESIONES 3D
+//
+// Este archivo:
+// 1. Carga los productos desde LocalStorage.
+// 2. Si no existen, utiliza productos.js como catálogo inicial.
+// 3. Muestra SOLO productos de categoría 3D.
+// 4. Permite agregarlos al carrito.
+// 5. Actualiza el contador del carrito.
+// ============================================================
 
 import { productosData } from "./productos.js";
 
-
-// ============================================================
-// ELEMENTOS
-// ============================================================
-
-const contenedorProductos =
-    document.getElementById(
-        "contenedor-productos"
-    );
+const contenedorProductos = document.getElementById(
+    "contenedor-productos"
+);
 
 
 // ============================================================
-// CATEGORÍA DE LA PÁGINA
-// ============================================================
-//
-// index.html
-//
-// <body data-categoria="3D">
-//
-//
-// tecnologia.html
-//
-// <body data-categoria="TECNOLOGIA">
+// INICIALIZAR CATÁLOGO LOCAL
 // ============================================================
 
-const categoriaPagina =
-    normalizarCategoria(
-        document.body.dataset.categoria
-    );
+function inicializarProductos() {
+
+    const inventarioActual = localStorage.getItem("inventario");
+
+    // Si no existe inventario, crear uno inicial
+    if (!inventarioActual) {
+
+        const productosIniciales = Object.entries(productosData).map(
+            ([id, producto]) => ({
+                id,
+                ...producto
+            })
+        );
+
+        localStorage.setItem(
+            "inventario",
+            JSON.stringify(productosIniciales)
+        );
+
+        return productosIniciales;
+    }
+
+    try {
+
+        const productos = JSON.parse(inventarioActual);
+
+        if (Array.isArray(productos)) {
+            return productos;
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Error leyendo inventario:",
+            error
+        );
+
+    }
+
+    return [];
+}
 
 
 // ============================================================
@@ -55,175 +75,32 @@ function normalizarCategoria(categoria) {
         return "";
     }
 
-
-    return String(categoria)
+    return categoria
+        .toString()
         .trim()
         .toUpperCase()
         .normalize("NFD")
-        .replace(
-            /[\u0300-\u036f]/g,
-            ""
-        );
+        .replace(/[\u0300-\u036f]/g, "");
 }
 
 
 // ============================================================
-// OBTENER INVENTARIO
+// OBTENER PRODUCTOS
 // ============================================================
 
-function obtenerInventario() {
+function obtenerProductos3D() {
 
-    try {
+    const productos = inicializarProductos();
 
-        const datos =
-            localStorage.getItem(
-                "inventario"
-            );
+    return productos.filter(producto => {
 
-
-        // ====================================================
-        // SI YA EXISTE INVENTARIO LOCAL
-        // ====================================================
-
-        if (datos) {
-
-            const inventario =
-                JSON.parse(datos);
-
-
-            if (Array.isArray(inventario)) {
-
-                return inventario;
-
-            }
-
-        }
-
-
-        // ====================================================
-        // PRIMERA EJECUCIÓN
-        //
-        // Convertimos productosData:
-        //
-        // {
-        //    prod_1: {...},
-        //    prod_2: {...}
-        // }
-        //
-        // en:
-        //
-        // [
-        //    {...},
-        //    {...}
-        // ]
-        // ====================================================
-
-        const inventarioInicial =
-            Object.entries(
-                productosData
-            ).map(
-                ([id, producto]) => {
-
-                    return {
-
-                        id,
-
-                        ...producto,
-
-                        // Compatibilidad
-                        // con el inventario nuevo
-
-                        precioVenta:
-                            producto.precio,
-
-                        imagen:
-                            producto.urlImagen || ""
-
-                    };
-
-                }
-            );
-
-
-        // Guardar catálogo inicial
-
-        localStorage.setItem(
-            "inventario",
-            JSON.stringify(
-                inventarioInicial
-            )
+        const categoria = normalizarCategoria(
+            producto.categoria
         );
 
+        return categoria === "3D";
 
-        return inventarioInicial;
-
-    } catch (error) {
-
-        console.error(
-            "Error al cargar inventario:",
-            error
-        );
-
-        return [];
-
-    }
-
-}
-
-
-// ============================================================
-// OBTENER PRECIO
-// ============================================================
-
-function obtenerPrecio(producto) {
-
-    return Number(
-        producto.precioVenta ??
-        producto.precio ??
-        0
-    );
-
-}
-
-
-// ============================================================
-// OBTENER IMAGEN
-// ============================================================
-
-function obtenerImagen(producto) {
-
-    return (
-        producto.imagen ||
-        producto.urlImagen ||
-        "assets/imagen no encontrada.jpg"
-    );
-
-}
-
-
-// ============================================================
-// ESCAPAR HTML
-//
-// Evita problemas si un nombre o descripción
-// contiene caracteres especiales.
-// ============================================================
-
-function escaparHTML(valor) {
-
-    if (valor === null ||
-        valor === undefined) {
-
-        return "";
-
-    }
-
-
-    return String(valor)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    });
 
 }
 
@@ -232,270 +109,114 @@ function escaparHTML(valor) {
 // MOSTRAR PRODUCTOS
 // ============================================================
 
-function cargarProductos() {
+function mostrarProductos() {
 
     if (!contenedorProductos) {
-
         console.error(
-            "No existe el contenedor de productos."
+            "No existe #contenedor-productos"
         );
-
         return;
-
     }
 
-
-    const inventario =
-        obtenerInventario();
-
-
-    // ========================================================
-    // FILTRAR POR CATEGORÍA
-    // ========================================================
-
-    const productos =
-        inventario.filter(
-            producto => {
-
-                return (
-                    normalizarCategoria(
-                        producto.categoria
-                    ) ===
-                    categoriaPagina
-                );
-
-            }
-        );
-
-
-    console.log(
-        "Categoría actual:",
-        categoriaPagina
-    );
-
-
-    console.log(
-        "Productos encontrados:",
-        productos.length
-    );
-
-
-    // Limpiar
+    const productos = obtenerProductos3D();
 
     contenedorProductos.innerHTML = "";
-
-
-    // ========================================================
-    // SIN PRODUCTOS
-    // ========================================================
 
     if (productos.length === 0) {
 
         contenedorProductos.innerHTML = `
-
             <div class="sin-productos">
-
-                <div class="icono-vacio">
-                    📦
-                </div>
-
-                <h3>
-                    No hay productos disponibles
-                </h3>
-
+                <h2>📦 No hay productos 3D disponibles</h2>
                 <p>
-                    Actualmente no existen productos
-                    publicados en esta categoría.
+                    Pronto agregaremos nuevos productos.
                 </p>
-
             </div>
-
         `;
 
         return;
-
     }
 
 
-    // ========================================================
-    // CREAR TARJETAS
-    // ========================================================
+    productos.forEach(producto => {
 
-    productos.forEach(
-        producto => {
+        const tarjeta = document.createElement("article");
 
-
-            const id =
-                producto.id ||
-                producto.codigo ||
-                producto.nombre;
+        tarjeta.className = "tarjeta-producto";
 
 
-            const nombre =
-                escaparHTML(
-                    producto.nombre ||
-                    "Producto"
-                );
+        // ----------------------------------------------------
+        // IMAGEN
+        // ----------------------------------------------------
 
+        let imagen = producto.urlImagen;
 
-            const codigo =
-                escaparHTML(
-                    producto.codigo ||
-                    id
-                );
+        if (!imagen || imagen.trim() === "") {
 
-
-            const descripcion =
-                escaparHTML(
-                    producto.descripcion ||
-                    ""
-                );
-
-
-            const precio =
-                obtenerPrecio(
-                    producto
-                );
-
-
-            const imagen =
-                escaparHTML(
-                    obtenerImagen(
-                        producto
-                    )
-                );
-
-
-            // =================================================
-            // TARJETA
-            // =================================================
-
-            const tarjeta =
-                document.createElement(
-                    "article"
-                );
-
-
-            tarjeta.className =
-                "tarjeta-producto";
-
-
-            tarjeta.innerHTML = `
-
-                <div class="producto-contenido">
-
-
-                    <span class="codigo-producto">
-
-                        Cód: ${codigo}
-
-                    </span>
-
-
-                    <h3>
-
-                        ${nombre}
-
-                    </h3>
-
-
-                    <div class="contenedor-imagen">
-
-                        <img
-                            src="${imagen}"
-                            alt="${nombre}"
-                            loading="lazy"
-                            onerror="
-                                this.src='assets/imagen no encontrada.jpg'
-                            "
-                        >
-
-                    </div>
-
-
-                    <p class="descripcion-producto">
-
-                        ${descripcion}
-
-                    </p>
-
-
-                </div>
-
-
-                <div class="producto-footer">
-
-
-                    <p class="precio">
-
-                        $${precio.toLocaleString(
-                            "es-CL"
-                        )}
-
-                    </p>
-
-
-                    <button
-                        class="btn-comprar"
-                        data-id="${id}"
-                    >
-
-                        🛒 AÑADIR AL CARRITO
-
-                    </button>
-
-
-                </div>
-
-            `;
-
-
-            contenedorProductos.appendChild(
-                tarjeta
-            );
+            imagen = "assets/imagen no encontrada.jpg";
 
         }
-    );
 
 
-    // Activar botones
+        // ----------------------------------------------------
+        // TARJETA
+        // ----------------------------------------------------
 
-    activarBotonesAgregar();
+        tarjeta.innerHTML = `
+
+            <div class="codigo-producto">
+                Cód: ${producto.codigo || producto.id}
+            </div>
+
+            <h3>
+                ${producto.nombre}
+            </h3>
+
+            <div class="contenedor-imagen">
+
+                <img
+                    src="${imagen}"
+                    alt="${producto.nombre}"
+                    loading="lazy"
+                >
+
+            </div>
+
+            <p class="descripcion-producto">
+                ${producto.descripcion || ""}
+            </p>
+
+            <p class="precio">
+                $${formatearPrecio(producto.precio)}
+            </p>
+
+            <button
+                class="btn-comprar"
+                data-id="${producto.id}"
+            >
+                🛒 Añadir al carrito
+            </button>
+
+        `;
+
+
+        contenedorProductos.appendChild(tarjeta);
+
+    });
+
+
+    activarBotonesCompra();
 
 }
 
 
 // ============================================================
-// ACTIVAR BOTONES
+// FORMATEAR PRECIO
 // ============================================================
 
-function activarBotonesAgregar() {
+function formatearPrecio(precio) {
 
-    const botones =
-        document.querySelectorAll(
-            ".btn-comprar"
-        );
-
-
-    botones.forEach(
-        boton => {
-
-            boton.addEventListener(
-                "click",
-                () => {
-
-                    const id =
-                        boton.dataset.id;
-
-
-                    agregarAlCarrito(
-                        id
-                    );
-
-                }
-            );
-
-        }
+    return Number(precio || 0).toLocaleString(
+        "es-CL"
     );
 
 }
@@ -505,22 +226,42 @@ function activarBotonesAgregar() {
 // AGREGAR AL CARRITO
 // ============================================================
 
+function activarBotonesCompra() {
+
+    const botones = document.querySelectorAll(
+        ".btn-comprar"
+    );
+
+
+    botones.forEach(boton => {
+
+        boton.addEventListener(
+            "click",
+            () => {
+
+                const id = boton.dataset.id;
+
+                agregarAlCarrito(id);
+
+            }
+        );
+
+    });
+
+}
+
+
+// ============================================================
+// AGREGAR PRODUCTO
+// ============================================================
+
 function agregarAlCarrito(id) {
 
-    const inventario =
-        obtenerInventario();
+    const productos = inicializarProductos();
 
-
-    const producto =
-        inventario.find(
-            p =>
-                String(
-                    p.id ||
-                    p.codigo ||
-                    p.nombre
-                ) ===
-                String(id)
-        );
+    const producto = productos.find(
+        p => p.id === id
+    );
 
 
     if (!producto) {
@@ -534,61 +275,31 @@ function agregarAlCarrito(id) {
     }
 
 
-    let carrito =
-        JSON.parse(
-            localStorage.getItem(
-                "carrito3d"
-            )
-        ) || [];
+    let carrito = JSON.parse(
+        localStorage.getItem("carrito3d")
+    ) || [];
 
 
-    const existente =
-        carrito.find(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
+    const existente = carrito.find(
+        item => item.id === id
+    );
 
-
-    // ========================================================
-    // YA EXISTE
-    // ========================================================
 
     if (existente) {
 
-        existente.cantidad =
-            Number(
-                existente.cantidad || 0
-            ) + 1;
+        existente.cantidad += 1;
 
-    }
-
-
-    // ========================================================
-    // PRODUCTO NUEVO
-    // ========================================================
-
-    else {
+    } else {
 
         carrito.push({
 
-            id,
+            id: producto.id,
 
-            nombre:
-                producto.nombre,
+            nombre: producto.nombre,
 
-            precio:
-                obtenerPrecio(
-                    producto
-                ),
+            precio: Number(producto.precio),
 
-            imagen:
-                obtenerImagen(
-                    producto
-                ),
-
-            categoria:
-                producto.categoria,
+            imagen: producto.urlImagen || "",
 
             cantidad: 1
 
@@ -597,13 +308,9 @@ function agregarAlCarrito(id) {
     }
 
 
-    // Guardar
-
     localStorage.setItem(
         "carrito3d",
-        JSON.stringify(
-            carrito
-        )
+        JSON.stringify(carrito)
     );
 
 
@@ -611,7 +318,7 @@ function agregarAlCarrito(id) {
 
 
     alert(
-        `¡${producto.nombre} agregado al carrito!`
+        `✅ ${producto.nombre} fue agregado al carrito.`
     );
 
 }
@@ -623,38 +330,26 @@ function agregarAlCarrito(id) {
 
 function actualizarContadorCarrito() {
 
-    const carrito =
-        JSON.parse(
-            localStorage.getItem(
-                "carrito3d"
-            )
-        ) || [];
+    const carrito = JSON.parse(
+        localStorage.getItem("carrito3d")
+    ) || [];
 
 
-    const total =
-        carrito.reduce(
-            (acumulado, producto) => {
-
-                return acumulado +
-                    Number(
-                        producto.cantidad || 0
-                    );
-
-            },
-            0
-        );
+    const cantidad = carrito.reduce(
+        (total, producto) =>
+            total + Number(producto.cantidad || 0),
+        0
+    );
 
 
-    const contador =
-        document.getElementById(
-            "contador-carrito"
-        );
+    const contador = document.getElementById(
+        "contador-carrito"
+    );
 
 
     if (contador) {
 
-        contador.textContent =
-            total;
+        contador.textContent = cantidad;
 
     }
 
@@ -662,14 +357,14 @@ function actualizarContadorCarrito() {
 
 
 // ============================================================
-// INICIAR
+// INICIO
 // ============================================================
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        cargarProductos();
+        mostrarProductos();
 
         actualizarContadorCarrito();
 

@@ -10,7 +10,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Mi Tienda - Tecnología</title>
+    <title>
+        Tecnología | Mi Tienda
+    </title>
 
     <link
         rel="stylesheet"
@@ -19,33 +21,19 @@
 
 </head>
 
-
-<!--
-    Esta página solamente mostrará
-    productos de la categoría TECNOLOGIA.
--->
-<body data-categoria="TECNOLOGIA">
-
-
-    <!-- =====================================================
-         CABECERA
-    ====================================================== -->
+<body>
 
     <header>
 
         <h1>
-            🖨️ Impresiones 3D & Tech
+            Impresiones 3D & Tech
         </h1>
-
 
         <nav>
 
-            <a
-                href="index.html"
-            >
+            <a href="index.html">
                 🖨️ Impresiones 3D
             </a>
-
 
             <a
                 href="tecnologia.html"
@@ -54,38 +42,20 @@
                 💻 Tecnología
             </a>
 
-
-            <a
-                href="carrito.html"
-            >
+            <a href="carrito.html">
                 🛒 Carrito
                 (<span id="contador-carrito">0</span>)
-            </a>
-
-
-            <a
-                href="login.html"
-            >
-                🔐 Administración
             </a>
 
         </nav>
 
     </header>
 
-
-    <!-- =====================================================
-         CONTENIDO
-    ====================================================== -->
-
     <main>
-
 
         <div class="titulo-seccion">
 
-            <strong>
-                CATÁLOGO
-            </strong>
+            Catálogo
 
             <span>
                 | Productos de Tecnología
@@ -93,37 +63,23 @@
 
         </div>
 
-
         <div
             id="contenedor-productos"
             class="grid-productos"
         >
 
-            <p>
-                Cargando productos...
+            <p class="cargando">
+                Cargando productos de tecnología...
             </p>
 
         </div>
 
-
     </main>
-
-
-    <!-- =====================================================
-         JAVASCRIPT
-    ====================================================== -->
-
-    <!--
-        YA NO utilizamos tech.js.
-
-        Las dos tiendas utilizan app.js.
-    -->
 
     <script
         type="module"
-        src="src/app.js"
+        src="src/tech.js"
     ></script>
-
 
 </body>
 
