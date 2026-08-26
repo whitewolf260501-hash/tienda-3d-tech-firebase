@@ -317,6 +317,62 @@ export const productosData = {
         precio: 4500,
         categoria: "TECNOLOGIA",
         urlImagen: ""
-    }
+    },
 
+// ========================================================
+// CARTAS
+// ========================================================
+
+"prod_31": {
+
+    codigo: "CARD-001",
+
+    nombre: "Carta Coleccionable Especial",
+
+    descripcion:
+        "Carta coleccionable edición especial.",
+
+    precio: 5000,
+
+    categoria: "CARTAS",
+
+    urlImagen: ""
+
+},
+
+
+"prod_32": {
+
+    codigo: "CARD-002",
+
+    nombre: "Carta Coleccionable Premium",
+
+    descripcion:
+        "Carta premium para coleccionistas.",
+
+    precio: 8000,
+
+    categoria: "CARTAS",
+
+    urlImagen: ""
+
+},
+
+
+"prod_33": {
+
+    codigo: "CARD-003",
+
+    nombre: "Pack de Cartas Coleccionables",
+
+    descripcion:
+        "Pack de cartas para coleccionistas.",
+
+    precio: 12000,
+
+    categoria: "CARTAS",
+
+    urlImagen: ""
+
+}
 };

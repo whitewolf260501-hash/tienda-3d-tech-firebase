@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cartas - Mi Tienda</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         CABECERA
+         ===================================================== -->
+
+    <header>
+
+        <h1>Impresiones 3D & Tech</h1>
+
+        <nav>
+
+            <a href="index.html">
+                🖨️ Impresiones 3D
+            </a>
+
+            <a href="tecnologia.html">
+                💻 Tecnología
+            </a>
+
+            <a href="cartas.html" class="activo">
+                🃏 Cartas
+            </a>
+
+            <a href="carrito.html">
+                🛒 Carrito
+                (<span id="contador-carrito">0</span>)
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <main>
+
+        <div class="titulo-seccion">
+
+            🃏 Catálogo
+
+            <span>
+                | Cartas
+            </span>
+
+        </div>
+
+
+        <!-- =================================================
+             PRODUCTOS
+             ================================================= -->
+
+        <div
+            id="contenedor-productos"
+            class="grid-productos"
+        >
+
+            <p class="cargando">
+                Cargando cartas...
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script
+        type="module"
+        src="src/cartas.js"
+    ></script>
+
+</body>
+</html>
