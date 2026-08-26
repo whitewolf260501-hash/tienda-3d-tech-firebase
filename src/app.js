@@ -1,135 +1,71 @@
 // ============================================================
 // app.js
-// ============================================================
-// CATÁLOGO PÚBLICO - IMPRESIONES 3D
-//
-// Este archivo:
-// 1. Carga los productos desde LocalStorage.
-// 2. Si no existen, utiliza productos.js como catálogo inicial.
-// 3. Muestra SOLO productos de categoría 3D.
-// 4. Permite agregarlos al carrito.
-// 5. Actualiza el contador del carrito.
+// Catálogo público de la tienda
 // ============================================================
 
 import { productosData } from "./productos.js";
 
-const contenedorProductos = document.getElementById(
-    "contenedor-productos"
-);
+// ------------------------------------------------------------
+// CONFIGURACIÓN
+// ------------------------------------------------------------
+
+// Imagen provisional para todos los productos
+const IMAGEN_DEFAULT = "assets/imagen no encontrada.jpg";
+
+// Contenedor del catálogo
+const contenedorProductos = document.getElementById("contenedor-productos");
+
+// Productos actualmente cargados
+let productosGlobales = [];
 
 
 // ============================================================
-// INICIALIZAR CATÁLOGO LOCAL
+// INICIALIZAR CATÁLOGO
 // ============================================================
 
-function inicializarProductos() {
+document.addEventListener("DOMContentLoaded", () => {
 
-    const inventarioActual = localStorage.getItem("inventario");
+    cargarProductos();
 
-    // Si no existe inventario, crear uno inicial
-    if (!inventarioActual) {
+    actualizarContadorCarrito();
 
-        const productosIniciales = Object.entries(productosData).map(
-            ([id, producto]) => ({
-                id,
-                ...producto
-            })
-        );
-
-        localStorage.setItem(
-            "inventario",
-            JSON.stringify(productosIniciales)
-        );
-
-        return productosIniciales;
-    }
-
-    try {
-
-        const productos = JSON.parse(inventarioActual);
-
-        if (Array.isArray(productos)) {
-            return productos;
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Error leyendo inventario:",
-            error
-        );
-
-    }
-
-    return [];
-}
+});
 
 
 // ============================================================
-// NORMALIZAR CATEGORÍA
+// CARGAR PRODUCTOS
 // ============================================================
 
-function normalizarCategoria(categoria) {
-
-    if (!categoria) {
-        return "";
-    }
-
-    return categoria
-        .toString()
-        .trim()
-        .toUpperCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-}
-
-
-// ============================================================
-// OBTENER PRODUCTOS
-// ============================================================
-
-function obtenerProductos3D() {
-
-    const productos = inicializarProductos();
-
-    return productos.filter(producto => {
-
-        const categoria = normalizarCategoria(
-            producto.categoria
-        );
-
-        return categoria === "3D";
-
-    });
-
-}
-
-
-// ============================================================
-// MOSTRAR PRODUCTOS
-// ============================================================
-
-function mostrarProductos() {
+function cargarProductos() {
 
     if (!contenedorProductos) {
-        console.error(
-            "No existe #contenedor-productos"
-        );
+        console.error("No existe #contenedor-productos");
         return;
     }
 
-    const productos = obtenerProductos3D();
-
     contenedorProductos.innerHTML = "";
 
-    if (productos.length === 0) {
+    // --------------------------------------------------------
+    // IMPORTANTE
+    // Por ahora usamos productosData.
+    // No dependemos de Firebase.
+    // --------------------------------------------------------
+
+    const productos = Object.entries(productosData);
+
+    productosGlobales = productos.map(([id, producto]) => ({
+        id,
+        ...producto
+    }));
+
+
+    // Si no existen productos
+    if (productosGlobales.length === 0) {
 
         contenedorProductos.innerHTML = `
             <div class="sin-productos">
-                <h2>📦 No hay productos 3D disponibles</h2>
-                <p>
-                    Pronto agregaremos nuevos productos.
-                </p>
+                <h2>📦 No hay productos disponibles</h2>
+                <p>Pronto agregaremos nuevos productos.</p>
             </div>
         `;
 
@@ -137,53 +73,172 @@ function mostrarProductos() {
     }
 
 
-    productos.forEach(producto => {
+    // --------------------------------------------------------
+    // GENERAR TARJETAS
+    // --------------------------------------------------------
 
-        const tarjeta = document.createElement("article");
+    productosGlobales.forEach((producto) => {
 
-        tarjeta.className = "tarjeta-producto";
+        const tarjeta = crearTarjetaProducto(producto);
 
+        contenedorProductos.appendChild(tarjeta);
 
-        // ----------------------------------------------------
-        // IMAGEN
-        // ----------------------------------------------------
-
-        let imagen = producto.urlImagen;
-
-        if (!imagen || imagen.trim() === "") {
-
-            imagen = "assets/imagen no encontrada.jpg";
-
-        }
+    });
 
 
-        // ----------------------------------------------------
-        // TARJETA
-        // ----------------------------------------------------
+    activarCarruseles();
 
-        tarjeta.innerHTML = `
+    activarBotonesComprar();
 
-            <div class="codigo-producto">
-                Cód: ${producto.codigo || producto.id}
+}
+
+
+// ============================================================
+// CREAR TARJETA
+// ============================================================
+
+function crearTarjetaProducto(producto) {
+
+    const tarjeta = document.createElement("article");
+
+    tarjeta.className = "tarjeta-producto";
+
+
+    // --------------------------------------------------------
+    // IMÁGENES
+    // --------------------------------------------------------
+
+    let imagenes = [];
+
+    // Si el producto tiene múltiples imágenes
+    if (Array.isArray(producto.imagenes)) {
+
+        imagenes = producto.imagenes.filter(
+            imagen => imagen && imagen.trim() !== ""
+        );
+
+    }
+
+    // Si tiene una sola URL antigua
+    if (
+        imagenes.length === 0 &&
+        producto.urlImagen &&
+        producto.urlImagen.trim() !== ""
+    ) {
+
+        imagenes.push(producto.urlImagen);
+
+    }
+
+
+    // --------------------------------------------------------
+    // SI NO TIENE IMAGEN
+    // --------------------------------------------------------
+
+    if (imagenes.length === 0) {
+
+        imagenes = [IMAGEN_DEFAULT];
+
+    }
+
+
+    // --------------------------------------------------------
+    // GENERAR IMÁGENES DEL CARRUSEL
+    // --------------------------------------------------------
+
+    const imagenesHTML = imagenes.map((imagen, index) => {
+
+        return `
+            <img
+                src="${imagen}"
+                class="imagen-carrusel ${index === 0 ? "activa" : ""}"
+                data-index="${index}"
+                alt="${producto.nombre}"
+                loading="lazy"
+                onerror="this.src='${IMAGEN_DEFAULT}'"
+            >
+        `;
+
+    }).join("");
+
+
+    // --------------------------------------------------------
+    // CONTROLES DEL CARRUSEL
+    // --------------------------------------------------------
+
+    const controlesHTML = imagenes.length > 1
+        ? `
+            <button
+                class="carrusel-btn anterior"
+                type="button"
+                aria-label="Imagen anterior"
+            >
+                ❮
+            </button>
+
+            <button
+                class="carrusel-btn siguiente"
+                type="button"
+                aria-label="Imagen siguiente"
+            >
+                ❯
+            </button>
+
+            <div class="indicadores-carrusel">
+                ${imagenes.map((_, index) => `
+                    <span
+                        class="indicador ${index === 0 ? "activo" : ""}"
+                        data-index="${index}">
+                    </span>
+                `).join("")}
             </div>
+        `
+        : "";
 
-            <h3>
+
+    // --------------------------------------------------------
+    // HTML DE LA TARJETA
+    // --------------------------------------------------------
+
+    tarjeta.innerHTML = `
+
+        <div class="producto-contenido">
+
+            <span class="codigo-producto">
+                Cód: ${producto.codigo || producto.id}
+            </span>
+
+
+            <h3 class="nombre-producto">
                 ${producto.nombre}
             </h3>
 
+
             <div class="contenedor-imagen">
 
-                <img
-                    src="${imagen}"
-                    alt="${producto.nombre}"
-                    loading="lazy"
-                >
+                <div class="carrusel-producto">
+
+                    <div class="imagenes-carrusel">
+
+                        ${imagenesHTML}
+
+                    </div>
+
+                    ${controlesHTML}
+
+                </div>
 
             </div>
+
 
             <p class="descripcion-producto">
                 ${producto.descripcion || ""}
             </p>
+
+        </div>
+
+
+        <div class="producto-footer">
 
             <p class="precio">
                 $${formatearPrecio(producto.precio)}
@@ -192,134 +247,214 @@ function mostrarProductos() {
             <button
                 class="btn-comprar"
                 data-id="${producto.id}"
+                data-nombre="${producto.nombre}"
+                data-precio="${producto.precio}"
             >
                 🛒 Añadir al carrito
             </button>
 
-        `;
+        </div>
+
+    `;
 
 
-        contenedorProductos.appendChild(tarjeta);
-
-    });
-
-
-    activarBotonesCompra();
+    return tarjeta;
 
 }
 
 
 // ============================================================
-// FORMATEAR PRECIO
+// ACTIVAR CARRUSELES
 // ============================================================
 
-function formatearPrecio(precio) {
+function activarCarruseles() {
 
-    return Number(precio || 0).toLocaleString(
-        "es-CL"
-    );
+    document
+        .querySelectorAll(".carrusel-producto")
+        .forEach(carrusel => {
 
-}
+            const imagenes = carrusel.querySelectorAll(
+                ".imagen-carrusel"
+            );
+
+            const indicadores = carrusel.querySelectorAll(
+                ".indicador"
+            );
+
+            const anterior = carrusel.querySelector(
+                ".anterior"
+            );
+
+            const siguiente = carrusel.querySelector(
+                ".siguiente"
+            );
 
 
-// ============================================================
-// AGREGAR AL CARRITO
-// ============================================================
-
-function activarBotonesCompra() {
-
-    const botones = document.querySelectorAll(
-        ".btn-comprar"
-    );
+            // Si solamente existe una imagen
+            if (imagenes.length <= 1) {
+                return;
+            }
 
 
-    botones.forEach(boton => {
+            let indiceActual = 0;
 
-        boton.addEventListener(
-            "click",
-            () => {
 
-                const id = boton.dataset.id;
+            function mostrarImagen(indice) {
 
-                agregarAlCarrito(id);
+                if (indice < 0) {
+                    indice = imagenes.length - 1;
+                }
+
+                if (indice >= imagenes.length) {
+                    indice = 0;
+                }
+
+
+                imagenes.forEach((imagen, i) => {
+
+                    imagen.classList.toggle(
+                        "activa",
+                        i === indice
+                    );
+
+                });
+
+
+                indicadores.forEach((indicador, i) => {
+
+                    indicador.classList.toggle(
+                        "activo",
+                        i === indice
+                    );
+
+                });
+
+
+                indiceActual = indice;
 
             }
-        );
-
-    });
-
-}
 
 
-// ============================================================
-// AGREGAR PRODUCTO
-// ============================================================
+            // Botón anterior
+            if (anterior) {
 
-function agregarAlCarrito(id) {
+                anterior.addEventListener("click", (e) => {
 
-    const productos = inicializarProductos();
+                    e.stopPropagation();
 
-    const producto = productos.find(
-        p => p.id === id
-    );
+                    mostrarImagen(indiceActual - 1);
 
+                });
 
-    if (!producto) {
-
-        alert(
-            "No se encontró el producto."
-        );
-
-        return;
-
-    }
+            }
 
 
-    let carrito = JSON.parse(
-        localStorage.getItem("carrito3d")
-    ) || [];
+            // Botón siguiente
+            if (siguiente) {
+
+                siguiente.addEventListener("click", (e) => {
+
+                    e.stopPropagation();
+
+                    mostrarImagen(indiceActual + 1);
+
+                });
+
+            }
 
 
-    const existente = carrito.find(
-        item => item.id === id
-    );
+            // Indicadores
+            indicadores.forEach(indicador => {
 
+                indicador.addEventListener("click", (e) => {
 
-    if (existente) {
+                    e.stopPropagation();
 
-        existente.cantidad += 1;
+                    const indice = Number(
+                        indicador.dataset.index
+                    );
 
-    } else {
+                    mostrarImagen(indice);
 
-        carrito.push({
+                });
 
-            id: producto.id,
-
-            nombre: producto.nombre,
-
-            precio: Number(producto.precio),
-
-            imagen: producto.urlImagen || "",
-
-            cantidad: 1
+            });
 
         });
 
-    }
+}
 
 
-    localStorage.setItem(
-        "carrito3d",
-        JSON.stringify(carrito)
-    );
+// ============================================================
+// BOTONES DE COMPRA
+// ============================================================
+
+function activarBotonesComprar() {
+
+    document
+        .querySelectorAll(".btn-comprar")
+        .forEach(boton => {
+
+            boton.addEventListener("click", () => {
+
+                const id = boton.dataset.id;
+                const nombre = boton.dataset.nombre;
+                const precio = Number(
+                    boton.dataset.precio
+                );
 
 
-    actualizarContadorCarrito();
+                let carrito = JSON.parse(
+                    localStorage.getItem("carrito3d")
+                ) || [];
 
 
-    alert(
-        `✅ ${producto.nombre} fue agregado al carrito.`
-    );
+                const productoExistente =
+                    carrito.find(item => item.id === id);
+
+
+                if (productoExistente) {
+
+                    productoExistente.cantidad++;
+
+                } else {
+
+                    carrito.push({
+
+                        id: id,
+
+                        nombre: nombre,
+
+                        precio: precio,
+
+                        cantidad: 1
+
+                    });
+
+                }
+
+
+                localStorage.setItem(
+                    "carrito3d",
+                    JSON.stringify(carrito)
+                );
+
+
+                actualizarContadorCarrito();
+
+
+                boton.textContent = "✓ Agregado";
+
+                setTimeout(() => {
+
+                    boton.textContent =
+                        "🛒 Añadir al carrito";
+
+                }, 1000);
+
+            });
+
+        });
 
 }
 
@@ -335,21 +470,20 @@ function actualizarContadorCarrito() {
     ) || [];
 
 
-    const cantidad = carrito.reduce(
+    const totalItems = carrito.reduce(
         (total, producto) =>
             total + Number(producto.cantidad || 0),
         0
     );
 
 
-    const contador = document.getElementById(
-        "contador-carrito"
-    );
+    const contador =
+        document.getElementById("contador-carrito");
 
 
     if (contador) {
 
-        contador.textContent = cantidad;
+        contador.textContent = totalItems;
 
     }
 
@@ -357,16 +491,13 @@ function actualizarContadorCarrito() {
 
 
 // ============================================================
-// INICIO
+// FORMATO DE PRECIO
 // ============================================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+function formatearPrecio(precio) {
 
-        mostrarProductos();
+    return Number(precio || 0).toLocaleString(
+        "es-CL"
+    );
 
-        actualizarContadorCarrito();
-
-    }
-);
+}

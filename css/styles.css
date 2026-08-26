@@ -1,5 +1,5 @@
 /* ============================================================
-   RESET GENERAL
+   RESET
    ============================================================ */
 
 * {
@@ -8,13 +8,11 @@
     padding: 0;
 }
 
-html {
-    scroll-behavior: smooth;
-}
 
 body {
     background-color: #ededed;
     color: #333;
+
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -23,35 +21,32 @@ body {
         Helvetica,
         Arial,
         sans-serif;
-
-    min-height: 100vh;
 }
 
 
 /* ============================================================
-   CABECERA
+   HEADER
    ============================================================ */
 
 header {
+
     background-color: #ffffff;
 
-    min-height: 80px;
-
-    padding: 1.2rem 3rem;
+    padding: 1.5rem 3rem;
 
     border-bottom: 1px solid #ddd;
 
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
-    position: sticky;
-    top: 0;
-    z-index: 1000;
 }
 
 
 header h1 {
+
     font-size: 1.2rem;
 
     color: #e67e22;
@@ -60,20 +55,22 @@ header h1 {
 
     letter-spacing: 1px;
 
-    white-space: nowrap;
 }
 
 
 header nav {
+
     display: flex;
 
     align-items: center;
 
     gap: 25px;
+
 }
 
 
 header nav a {
+
     color: #333;
 
     text-decoration: none;
@@ -82,24 +79,22 @@ header nav a {
 
     font-weight: 600;
 
-    transition:
-        color 0.2s ease,
-        transform 0.2s ease;
 }
 
 
 header nav a:hover {
+
     color: #e67e22;
 
-    transform: translateY(-1px);
 }
 
 
 /* ============================================================
-   CONTENEDOR PRINCIPAL
+   MAIN
    ============================================================ */
 
 main {
+
     width: 100%;
 
     max-width: 1200px;
@@ -107,14 +102,12 @@ main {
     margin: 2.5rem auto;
 
     padding: 0 2rem;
+
 }
 
 
-/* ============================================================
-   TÍTULO DE SECCIÓN
-   ============================================================ */
-
 .titulo-seccion {
+
     font-size: 1.1rem;
 
     color: #e67e22;
@@ -130,10 +123,12 @@ main {
     border-bottom: 1px solid #ddd;
 
     padding-bottom: 10px;
+
 }
 
 
 .titulo-seccion span {
+
     color: #555;
 
     font-weight: normal;
@@ -141,36 +136,39 @@ main {
     font-size: 0.95rem;
 
     margin-left: 10px;
+
 }
 
 
 /* ============================================================
-   GRID DE PRODUCTOS
+   GRID
    ============================================================ */
 
 .grid-productos {
-    width: 100%;
 
     display: grid;
 
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
 
     gap: 20px;
 
     align-items: stretch;
+
 }
 
 
 /* ============================================================
-   TARJETA DEL PRODUCTO
+   TARJETA
    ============================================================ */
 
 .tarjeta-producto {
+
     width: 100%;
 
     min-width: 0;
 
-    min-height: 500px;
+    height: 520px;
 
     background: #ffffff;
 
@@ -178,7 +176,7 @@ main {
 
     border-radius: 6px;
 
-    padding: 14px;
+    padding: 12px;
 
     display: flex;
 
@@ -186,52 +184,56 @@ main {
 
     justify-content: space-between;
 
-    text-align: center;
-
-    position: relative;
-
     overflow: hidden;
 
     transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+
 }
 
 
 .tarjeta-producto:hover {
-    transform: translateY(-4px);
+
+    transform: translateY(-5px);
 
     border-color: #ff6b4a;
 
     box-shadow:
         0 8px 20px rgba(0, 0, 0, 0.12);
+
 }
 
 
 /* ============================================================
-   CONTENIDO SUPERIOR
+   CONTENIDO
    ============================================================ */
 
 .producto-contenido {
+
     width: 100%;
 
     display: flex;
 
     flex-direction: column;
 
-    flex: 1;
+    min-height: 0;
+
 }
 
 
 /* ============================================================
-   CÓDIGO DEL PRODUCTO
+   CÓDIGO
    ============================================================ */
 
 .codigo-producto {
-    display: inline-block;
 
-    align-self: center;
+    display: block;
+
+    width: max-content;
+
+    margin: 0 auto;
 
     background: #eeeeee;
 
@@ -243,20 +245,18 @@ main {
 
     font-size: 12px;
 
-    line-height: 1.2;
-
-    margin-bottom: 8px;
 }
 
 
 /* ============================================================
-   NOMBRE DEL PRODUCTO
+   NOMBRE
    ============================================================ */
 
 .nombre-producto {
+
     width: 100%;
 
-    min-height: 48px;
+    height: 50px;
 
     display: flex;
 
@@ -266,36 +266,140 @@ main {
 
     text-align: center;
 
-    margin: 5px 0 12px;
+    margin: 8px 0;
 
     font-size: 16px;
 
-    line-height: 1.3;
+    line-height: 1.25;
 
-    font-weight: 500;
+    overflow: hidden;
 
-    color: #222;
-
-    overflow-wrap: break-word;
 }
 
 
 /* ============================================================
    CONTENEDOR DE IMAGEN
-   IMPORTANTE:
-   ESTA ALTURA NO CAMBIA CUANDO CARGA LA IMAGEN
    ============================================================ */
 
 .contenedor-imagen {
+
     width: 100%;
 
-    height: 220px;
+    height: 230px;
 
-    min-height: 220px;
+    min-height: 230px;
 
-    max-height: 220px;
+    max-height: 230px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
 
     flex-shrink: 0;
+
+}
+
+
+/* ============================================================
+   CARRUSEL
+   ============================================================ */
+
+.carrusel-producto {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: hidden;
+
+}
+
+
+.imagenes-carrusel {
+
+    width: 100%;
+
+    height: 100%;
+
+    position: relative;
+
+}
+
+
+/* ============================================================
+   IMÁGENES
+   ============================================================ */
+
+.imagen-carrusel {
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease;
+
+}
+
+
+/* SOLO UNA IMAGEN VISIBLE */
+
+.imagen-carrusel.activa {
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+
+/* ============================================================
+   BOTONES DEL CARRUSEL
+   ============================================================ */
+
+.carrusel-btn {
+
+    position: absolute;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 32px;
+
+    height: 32px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    color: white;
+
+    cursor: pointer;
+
+    z-index: 5;
 
     display: flex;
 
@@ -303,44 +407,76 @@ main {
 
     justify-content: center;
 
-    overflow: hidden;
+    font-size: 16px;
 
-    background-color: #ffffff;
+}
 
-    border: 1px solid #eeeeee;
 
-    border-radius: 4px;
+.carrusel-btn:hover {
 
-    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.8);
 
-    position: relative;
+}
+
+
+.carrusel-btn.anterior {
+
+    left: 8px;
+
+}
+
+
+.carrusel-btn.siguiente {
+
+    right: 8px;
+
 }
 
 
 /* ============================================================
-   IMAGEN DEL PRODUCTO
-
-   IMPORTANTE:
-   Nunca dejamos que la imagen determine el tamaño
-   de la tarjeta.
+   INDICADORES
    ============================================================ */
 
-.contenedor-imagen img {
-    display: block;
+.indicadores-carrusel {
 
-    width: auto;
+    position: absolute;
 
-    height: auto;
+    bottom: 8px;
 
-    max-width: 100%;
+    left: 0;
 
-    max-height: 100%;
+    width: 100%;
 
-    object-fit: contain;
+    display: flex;
 
-    object-position: center;
+    justify-content: center;
 
-    flex-shrink: 0;
+    gap: 6px;
+
+    z-index: 5;
+
+}
+
+
+.indicador {
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: rgba(0, 0, 0, 0.3);
+
+    cursor: pointer;
+
+}
+
+
+.indicador.activo {
+
+    background: #ff684f;
+
 }
 
 
@@ -349,15 +485,14 @@ main {
    ============================================================ */
 
 .descripcion-producto {
-    width: 100%;
 
-    min-height: 60px;
+    height: 65px;
 
-    max-height: 60px;
+    min-height: 65px;
 
-    margin: 8px 0;
+    max-height: 65px;
 
-    padding: 0 4px;
+    margin: 10px 4px;
 
     text-align: center;
 
@@ -369,11 +504,6 @@ main {
 
     overflow: hidden;
 
-    display: -webkit-box;
-
-    -webkit-line-clamp: 3;
-
-    -webkit-box-orient: vertical;
 }
 
 
@@ -382,11 +512,13 @@ main {
    ============================================================ */
 
 .producto-footer {
+
     width: 100%;
 
     margin-top: auto;
 
     text-align: center;
+
 }
 
 
@@ -395,7 +527,6 @@ main {
    ============================================================ */
 
 .precio {
-    min-height: 30px;
 
     margin: 8px 0;
 
@@ -404,17 +535,17 @@ main {
     font-weight: bold;
 
     color: #111;
+
 }
 
 
 /* ============================================================
-   BOTÓN COMPRAR
+   BOTÓN COMPRA
    ============================================================ */
 
 .btn-comprar {
-    width: 100%;
 
-    min-height: 42px;
+    width: 100%;
 
     border: none;
 
@@ -422,60 +553,42 @@ main {
 
     border-radius: 4px;
 
-    background-color: #ff684f;
+    background: #ff684f;
 
-    color: #ffffff;
-
-    font-size: 13px;
+    color: white;
 
     font-weight: bold;
-
-    letter-spacing: 0.5px;
 
     cursor: pointer;
 
     transition:
-        background-color 0.2s ease,
+        background 0.2s ease,
         transform 0.2s ease;
+
 }
 
 
 .btn-comprar:hover {
-    background-color: #e9543c;
+
+    background: #e9543c;
 
     transform: scale(1.02);
-}
 
-
-.btn-comprar:active {
-    transform: scale(0.98);
 }
 
 
 /* ============================================================
-   MENSAJE CARGANDO
+   CARGANDO
    ============================================================ */
 
 .cargando {
+
     grid-column: 1 / -1;
-
-    width: 100%;
-
-    min-height: 250px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
 
     text-align: center;
 
     padding: 50px;
 
-    color: #777;
-
-    font-size: 16px;
 }
 
 
@@ -484,99 +597,98 @@ main {
    ============================================================ */
 
 .sin-productos {
+
     grid-column: 1 / -1;
-
-    width: 100%;
-
-    min-height: 250px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
 
     text-align: center;
 
     padding: 50px;
 
-    background: #ffffff;
+    background: white;
 
-    border: 1px solid #ddd;
+    border-radius: 8px;
 
-    border-radius: 6px;
-
-    color: #777;
 }
 
 
 /* ============================================================
-   RESPONSIVE
+   TABLET
    ============================================================ */
 
 @media (max-width: 1000px) {
 
     .grid-productos {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
     }
 
 }
 
+
+/* ============================================================
+   TABLET PEQUEÑA
+   ============================================================ */
 
 @media (max-width: 750px) {
 
     header {
-        padding: 1rem 1.5rem;
 
         flex-direction: column;
 
         gap: 15px;
+
+        padding: 1.2rem;
+
     }
 
 
     header nav {
+
+        gap: 15px;
+
         flex-wrap: wrap;
 
         justify-content: center;
 
-        gap: 15px;
     }
 
 
     main {
+
         padding: 0 1rem;
+
     }
 
 
     .grid-productos {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
 
-        gap: 15px;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
     }
 
 }
 
 
+/* ============================================================
+   CELULAR
+   ============================================================ */
+
 @media (max-width: 500px) {
 
     .grid-productos {
+
         grid-template-columns: 1fr;
+
     }
 
 
     .tarjeta-producto {
-        min-height: 490px;
-    }
 
+        height: 520px;
 
-    .contenedor-imagen {
-        height: 220px;
-
-        min-height: 220px;
-
-        max-height: 220px;
     }
 
 }
