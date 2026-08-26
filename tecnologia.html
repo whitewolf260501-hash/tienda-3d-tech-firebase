@@ -1,32 +1,130 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tecnología - Mi Tienda</title>
-    <link rel="stylesheet" href="css/styles.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Mi Tienda - Tecnología</title>
+
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
+
 </head>
-<body>
+
+
+<!--
+    Esta página solamente mostrará
+    productos de la categoría TECNOLOGIA.
+-->
+<body data-categoria="TECNOLOGIA">
+
+
+    <!-- =====================================================
+         CABECERA
+    ====================================================== -->
 
     <header>
-        <h1>Impresiones 3D & Tech</h1>
+
+        <h1>
+            🖨️ Impresiones 3D & Tech
+        </h1>
+
+
         <nav>
-            <a href="index.html">Impresiones 3D</a>
-            <a href="tecnologia.html" style="color: #ff6b4a;">Tecnología</a>
-            <a href="carrito.html">🛒 Carrito (<span id="contador-carrito">0</span>)</a>
+
+            <a
+                href="index.html"
+            >
+                🖨️ Impresiones 3D
+            </a>
+
+
+            <a
+                href="tecnologia.html"
+                class="activo"
+            >
+                💻 Tecnología
+            </a>
+
+
+            <a
+                href="carrito.html"
+            >
+                🛒 Carrito
+                (<span id="contador-carrito">0</span>)
+            </a>
+
+
+            <a
+                href="login.html"
+            >
+                🔐 Administración
+            </a>
+
         </nav>
+
     </header>
 
+
+    <!-- =====================================================
+         CONTENIDO
+    ====================================================== -->
+
     <main>
+
+
         <div class="titulo-seccion">
-            Catálogo <span>| Productos de Tecnología</span>
+
+            <strong>
+                CATÁLOGO
+            </strong>
+
+            <span>
+                | Productos de Tecnología
+            </span>
+
         </div>
-        
-        <div id="contenedor-productos" class="grid-productos">
-            <p>Cargando productos de tecnología...</p>
+
+
+        <div
+            id="contenedor-productos"
+            class="grid-productos"
+        >
+
+            <p>
+                Cargando productos...
+            </p>
+
         </div>
+
+
     </main>
 
-    <script type="module" src="src/tech.js"></script>
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <!--
+        YA NO utilizamos tech.js.
+
+        Las dos tiendas utilizan app.js.
+    -->
+
+    <script
+        type="module"
+        src="src/app.js"
+    ></script>
+
+
 </body>
+
 </html>

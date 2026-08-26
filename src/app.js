@@ -1,150 +1,677 @@
-import { db } from "./firebase.js";
-import { ref, onValue } from "firebase/database";
-import { productosData } from "./productos.js"; // Respaldo local
+// ============================================================
+// app.js
+// CATÁLOGO PÚBLICO
+//
+// NO UTILIZA FIREBASE.
+//
+// Los productos se almacenan localmente mediante:
+//
+// localStorage
+//
+// Además utiliza productos.js como catálogo inicial.
+// ============================================================
 
-const contenedorProductos = document.getElementById("contenedor-productos");
-let productosGlobales = [];
-let firebaseRespondio = false;
 
-function renderizarInventario(data) {
+import { productosData } from "./productos.js";
+
+
+// ============================================================
+// ELEMENTOS
+// ============================================================
+
+const contenedorProductos =
+    document.getElementById(
+        "contenedor-productos"
+    );
+
+
+// ============================================================
+// CATEGORÍA DE LA PÁGINA
+// ============================================================
+//
+// index.html
+//
+// <body data-categoria="3D">
+//
+//
+// tecnologia.html
+//
+// <body data-categoria="TECNOLOGIA">
+// ============================================================
+
+const categoriaPagina =
+    normalizarCategoria(
+        document.body.dataset.categoria
+    );
+
+
+// ============================================================
+// NORMALIZAR CATEGORÍA
+// ============================================================
+
+function normalizarCategoria(categoria) {
+
+    if (!categoria) {
+        return "";
+    }
+
+
+    return String(categoria)
+        .trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        );
+}
+
+
+// ============================================================
+// OBTENER INVENTARIO
+// ============================================================
+
+function obtenerInventario() {
+
+    try {
+
+        const datos =
+            localStorage.getItem(
+                "inventario"
+            );
+
+
+        // ====================================================
+        // SI YA EXISTE INVENTARIO LOCAL
+        // ====================================================
+
+        if (datos) {
+
+            const inventario =
+                JSON.parse(datos);
+
+
+            if (Array.isArray(inventario)) {
+
+                return inventario;
+
+            }
+
+        }
+
+
+        // ====================================================
+        // PRIMERA EJECUCIÓN
+        //
+        // Convertimos productosData:
+        //
+        // {
+        //    prod_1: {...},
+        //    prod_2: {...}
+        // }
+        //
+        // en:
+        //
+        // [
+        //    {...},
+        //    {...}
+        // ]
+        // ====================================================
+
+        const inventarioInicial =
+            Object.entries(
+                productosData
+            ).map(
+                ([id, producto]) => {
+
+                    return {
+
+                        id,
+
+                        ...producto,
+
+                        // Compatibilidad
+                        // con el inventario nuevo
+
+                        precioVenta:
+                            producto.precio,
+
+                        imagen:
+                            producto.urlImagen || ""
+
+                    };
+
+                }
+            );
+
+
+        // Guardar catálogo inicial
+
+        localStorage.setItem(
+            "inventario",
+            JSON.stringify(
+                inventarioInicial
+            )
+        );
+
+
+        return inventarioInicial;
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar inventario:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+// ============================================================
+// OBTENER PRECIO
+// ============================================================
+
+function obtenerPrecio(producto) {
+
+    return Number(
+        producto.precioVenta ??
+        producto.precio ??
+        0
+    );
+
+}
+
+
+// ============================================================
+// OBTENER IMAGEN
+// ============================================================
+
+function obtenerImagen(producto) {
+
+    return (
+        producto.imagen ||
+        producto.urlImagen ||
+        "assets/imagen no encontrada.jpg"
+    );
+
+}
+
+
+// ============================================================
+// ESCAPAR HTML
+//
+// Evita problemas si un nombre o descripción
+// contiene caracteres especiales.
+// ============================================================
+
+function escaparHTML(valor) {
+
+    if (valor === null ||
+        valor === undefined) {
+
+        return "";
+
+    }
+
+
+    return String(valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================================================
+// MOSTRAR PRODUCTOS
+// ============================================================
+
+function cargarProductos() {
+
+    if (!contenedorProductos) {
+
+        console.error(
+            "No existe el contenedor de productos."
+        );
+
+        return;
+
+    }
+
+
+    const inventario =
+        obtenerInventario();
+
+
+    // ========================================================
+    // FILTRAR POR CATEGORÍA
+    // ========================================================
+
+    const productos =
+        inventario.filter(
+            producto => {
+
+                return (
+                    normalizarCategoria(
+                        producto.categoria
+                    ) ===
+                    categoriaPagina
+                );
+
+            }
+        );
+
+
+    console.log(
+        "Categoría actual:",
+        categoriaPagina
+    );
+
+
+    console.log(
+        "Productos encontrados:",
+        productos.length
+    );
+
+
+    // Limpiar
+
     contenedorProductos.innerHTML = "";
-    productosGlobales = [];
 
-    Object.entries(data).forEach(([id, producto]) => {
-        productosGlobales.push({ id, ...producto });
 
-        const imagenSrc = producto.urlImagen && producto.urlImagen.trim() !== "" 
-            ? producto.urlImagen 
-            : "assets/imagen no encontrada.jpg";
+    // ========================================================
+    // SIN PRODUCTOS
+    // ========================================================
 
-        const tarjeta = document.createElement("div");
-        tarjeta.classList.add("tarjeta-producto");
+    if (productos.length === 0) {
 
-        tarjeta.innerHTML = `
-            <div>
-                <span style="font-size: 0.7rem; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555;">Cód: ${producto.codigo || id}</span>
-                <h3>${producto.nombre}</h3>
-                <div class="contenedor-imagen">
-                    <img src="${imagenSrc}" alt="${producto.nombre}">
+        contenedorProductos.innerHTML = `
+
+            <div class="sin-productos">
+
+                <div class="icono-vacio">
+                    📦
                 </div>
-                <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">${producto.descripcion || ''}</p>
+
+                <h3>
+                    No hay productos disponibles
+                </h3>
+
+                <p>
+                    Actualmente no existen productos
+                    publicados en esta categoría.
+                </p>
+
             </div>
-            <div>
-                <p class="precio">$${producto.precio}</p>
-                <button class="btn-comprar" data-id="${id}" data-nombre="${producto.nombre}" data-precio="${producto.precio}">
-                    Añadir al carrito
-                </button>
-            </div>
+
         `;
-        contenedorProductos.appendChild(tarjeta);
-    });
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // CREAR TARJETAS
+    // ========================================================
+
+    productos.forEach(
+        producto => {
+
+
+            const id =
+                producto.id ||
+                producto.codigo ||
+                producto.nombre;
+
+
+            const nombre =
+                escaparHTML(
+                    producto.nombre ||
+                    "Producto"
+                );
+
+
+            const codigo =
+                escaparHTML(
+                    producto.codigo ||
+                    id
+                );
+
+
+            const descripcion =
+                escaparHTML(
+                    producto.descripcion ||
+                    ""
+                );
+
+
+            const precio =
+                obtenerPrecio(
+                    producto
+                );
+
+
+            const imagen =
+                escaparHTML(
+                    obtenerImagen(
+                        producto
+                    )
+                );
+
+
+            // =================================================
+            // TARJETA
+            // =================================================
+
+            const tarjeta =
+                document.createElement(
+                    "article"
+                );
+
+
+            tarjeta.className =
+                "tarjeta-producto";
+
+
+            tarjeta.innerHTML = `
+
+                <div class="producto-contenido">
+
+
+                    <span class="codigo-producto">
+
+                        Cód: ${codigo}
+
+                    </span>
+
+
+                    <h3>
+
+                        ${nombre}
+
+                    </h3>
+
+
+                    <div class="contenedor-imagen">
+
+                        <img
+                            src="${imagen}"
+                            alt="${nombre}"
+                            loading="lazy"
+                            onerror="
+                                this.src='assets/imagen no encontrada.jpg'
+                            "
+                        >
+
+                    </div>
+
+
+                    <p class="descripcion-producto">
+
+                        ${descripcion}
+
+                    </p>
+
+
+                </div>
+
+
+                <div class="producto-footer">
+
+
+                    <p class="precio">
+
+                        $${precio.toLocaleString(
+                            "es-CL"
+                        )}
+
+                    </p>
+
+
+                    <button
+                        class="btn-comprar"
+                        data-id="${id}"
+                    >
+
+                        🛒 AÑADIR AL CARRITO
+
+                    </button>
+
+
+                </div>
+
+            `;
+
+
+            contenedorProductos.appendChild(
+                tarjeta
+            );
+
+        }
+    );
+
+
+    // Activar botones
 
     activarBotonesAgregar();
+
 }
 
-function cargarProductosTiempoReal() {
-    contenedorProductos.innerHTML = "<p style='padding: 20px;'>Cargando inventario...</p>";
-    const productosRef = ref(db, "productos");
 
-    const timeoutRespaldo = setTimeout(() => {
-        if (!firebaseRespondio) {
-            console.warn("Firebase tardó en responder. Usando catálogo local de respaldo.");
-            renderizarInventario(productosData);
-        }
-    }, 2500);
-
-    onValue(productosRef, (snapshot) => {
-        firebaseRespondio = true;
-        clearTimeout(timeoutRespaldo);
-        const data = snapshot.val();
-
-        if (!data) {
-            renderizarInventario(productosData);
-            return;
-        }
-        renderizarInventario(data);
-    }, (error) => {
-        console.warn("Error de Firebase, usando respaldo local: ", error);
-        firebaseRespondio = true;
-        clearTimeout(timeoutRespaldo);
-        renderizarInventario(productosData);
-    });
-}
-
-function generarExcelEtiquetas() {
-    if (productosGlobales.length === 0) { alert("No hay productos."); return; }
-    let csvContent = "data:text/csv;charset=utf-8,Codigo,Nombre,Precio\n";
-    productosGlobales.forEach(p => {
-        csvContent += `${p.codigo || p.id},"${(p.nombre || "").replace(/"/g, '""')}",${p.precio || 0}\n`;
-    });
-    const link = document.createElement("a");
-    link.href = encodeURI(csvContent);
-    link.download = "etiquetas_productos.csv";
-    link.click();
-}
-
-function exportarAExcel() {
-    if (productosGlobales.length === 0) return;
-    let csvContent = "data:text/csv;charset=utf-8,Codigo,Nombre,Categoria,Precio,Descripcion\n";
-    productosGlobales.forEach(p => {
-        csvContent += `${p.codigo || p.id},"${(p.nombre || "").replace(/"/g, '""')}","${(p.categoria || "").replace(/"/g, '""')}",${p.precio || 0},"${(p.descripcion || "").replace(/"/g, '""')}"\n`;
-    });
-    const link = document.createElement("a");
-    link.href = encodeURI(csvContent);
-    link.download = "inventario_tienda_3d_tech.csv";
-    link.click();
-}
-
-function crearBotonesHerramientas() {
-    const mainEl = document.querySelector("main");
-    if (document.getElementById("barra-herramientas-admin")) return;
-    const barra = document.createElement("div");
-    barra.id = "barra-herramientas-admin";
-    barra.style.cssText = "margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;";
-
-    const btnExportar = document.createElement("button");
-    btnExportar.textContent = "📊 Descargar Inventario (Excel)";
-    btnExportar.style.cssText = "background: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;";
-    btnExportar.onclick = exportarAExcel;
-
-    const btnEtiquetas = document.createElement("button");
-    btnEtiquetas.textContent = "🏷️ Descargar Excel para Etiquetas";
-    btnEtiquetas.style.cssText = "background: #e67e22; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;";
-    btnEtiquetas.onclick = generarExcelEtiquetas;
-
-    barra.appendChild(btnExportar);
-    barra.appendChild(btnEtiquetas);
-    mainEl.insertBefore(barra, contenedorProductos);
-}
+// ============================================================
+// ACTIVAR BOTONES
+// ============================================================
 
 function activarBotonesAgregar() {
-    document.querySelectorAll(".btn-comprar").forEach(boton => {
-        boton.onclick = (e) => {
-            const id = e.target.dataset.id;
-            const nombre = e.target.dataset.nombre;
-            const precio = parseFloat(e.target.dataset.precio);
 
-            let carrito = JSON.parse(localStorage.getItem("carrito3d")) || [];
-            const index = carrito.findIndex(item => item.id === id);
-            if (index > -1) carrito[index].cantidad += 1;
-            else carrito.push({ id, nombre, precio, cantidad: 1 });
+    const botones =
+        document.querySelectorAll(
+            ".btn-comprar"
+        );
 
-            localStorage.setItem("carrito3d", JSON.stringify(carrito));
-            actualizarContadorCarrito();
-            alert(`¡${nombre} agregado al carrito!`);
-        };
-    });
+
+    botones.forEach(
+        boton => {
+
+            boton.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        boton.dataset.id;
+
+
+                    agregarAlCarrito(
+                        id
+                    );
+
+                }
+            );
+
+        }
+    );
+
 }
+
+
+// ============================================================
+// AGREGAR AL CARRITO
+// ============================================================
+
+function agregarAlCarrito(id) {
+
+    const inventario =
+        obtenerInventario();
+
+
+    const producto =
+        inventario.find(
+            p =>
+                String(
+                    p.id ||
+                    p.codigo ||
+                    p.nombre
+                ) ===
+                String(id)
+        );
+
+
+    if (!producto) {
+
+        alert(
+            "No se encontró el producto."
+        );
+
+        return;
+
+    }
+
+
+    let carrito =
+        JSON.parse(
+            localStorage.getItem(
+                "carrito3d"
+            )
+        ) || [];
+
+
+    const existente =
+        carrito.find(
+            item =>
+                String(item.id) ===
+                String(id)
+        );
+
+
+    // ========================================================
+    // YA EXISTE
+    // ========================================================
+
+    if (existente) {
+
+        existente.cantidad =
+            Number(
+                existente.cantidad || 0
+            ) + 1;
+
+    }
+
+
+    // ========================================================
+    // PRODUCTO NUEVO
+    // ========================================================
+
+    else {
+
+        carrito.push({
+
+            id,
+
+            nombre:
+                producto.nombre,
+
+            precio:
+                obtenerPrecio(
+                    producto
+                ),
+
+            imagen:
+                obtenerImagen(
+                    producto
+                ),
+
+            categoria:
+                producto.categoria,
+
+            cantidad: 1
+
+        });
+
+    }
+
+
+    // Guardar
+
+    localStorage.setItem(
+        "carrito3d",
+        JSON.stringify(
+            carrito
+        )
+    );
+
+
+    actualizarContadorCarrito();
+
+
+    alert(
+        `¡${producto.nombre} agregado al carrito!`
+    );
+
+}
+
+
+// ============================================================
+// CONTADOR DEL CARRITO
+// ============================================================
 
 function actualizarContadorCarrito() {
-    const carrito = JSON.parse(localStorage.getItem("carrito3d")) || [];
-    const totalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
-    const contadorEl = document.getElementById("contador-carrito");
-    if (contadorEl) contadorEl.textContent = totalItems;
+
+    const carrito =
+        JSON.parse(
+            localStorage.getItem(
+                "carrito3d"
+            )
+        ) || [];
+
+
+    const total =
+        carrito.reduce(
+            (acumulado, producto) => {
+
+                return acumulado +
+                    Number(
+                        producto.cantidad || 0
+                    );
+
+            },
+            0
+        );
+
+
+    const contador =
+        document.getElementById(
+            "contador-carrito"
+        );
+
+
+    if (contador) {
+
+        contador.textContent =
+            total;
+
+    }
+
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    crearBotonesHerramientas();
-    cargarProductosTiempoReal();
-    actualizarContadorCarrito();
-});
+
+// ============================================================
+// INICIAR
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        cargarProductos();
+
+        actualizarContadorCarrito();
+
+    }
+);

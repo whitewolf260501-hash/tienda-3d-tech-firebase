@@ -1,35 +1,132 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Tienda - 3D y Tecnología</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
 
-    <!-- Cabecera -->
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Mi Tienda - Impresiones 3D</title>
+
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
+
+</head>
+
+
+<!--
+    IMPORTANTE:
+
+    Esta página solamente mostrará productos
+    cuya categoría sea "3D".
+-->
+<body data-categoria="3D">
+
+
+    <!-- =====================================================
+         CABECERA
+    ====================================================== -->
+
     <header>
-        <h1>Impresiones 3D & Tech</h1>
+
+        <h1>
+            🖨️ Impresiones 3D & Tech
+        </h1>
+
+
         <nav>
-        <a href="index.html">Impresiones 3D</a>
-        <a href="tecnologia.html">Tecnología</a>
-        <a href="carrito.html">🛒 Carrito (<span id="contador-carrito">0</span>)</a></nav>
+
+            <a
+                href="index.html"
+                class="activo"
+            >
+                🖨️ Impresiones 3D
+            </a>
+
+
+            <a
+                href="tecnologia.html"
+            >
+                💻 Tecnología
+            </a>
+
+
+            <a
+                href="carrito.html"
+            >
+                🛒 Carrito
+                (<span id="contador-carrito">0</span>)
+            </a>
+
+
+            <!-- Acceso al área privada -->
+
+            <a
+                href="login.html"
+            >
+                🔐 Administración
+            </a>
+
+        </nav>
+
     </header>
 
-    <!-- Contenedor Principal del Catálogo -->
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
+
     <main>
+
+
         <div class="titulo-seccion">
-            Catálogo <span>| Productos 3D y Tecnología</span>
+
+            <strong>
+                CATÁLOGO
+            </strong>
+
+            <span>
+                | Impresiones 3D
+            </span>
+
         </div>
-        
-        <!-- Aquí JavaScript inyectará las tarjetas de productos desde Firebase -->
-        <div id="contenedor-productos" class="grid-productos">
-            <p>Cargando productos...</p>
+
+
+        <!--
+            app.js cargará aquí los productos
+        -->
+
+        <div
+            id="contenedor-productos"
+            class="grid-productos"
+        >
+
+            <p>
+                Cargando productos...
+            </p>
+
         </div>
+
+
     </main>
 
-    <!-- Scripts -->
-    <script type="module" src="src/app.js"></script>
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="src/app.js"
+    ></script>
+
+
 </body>
+
 </html>
