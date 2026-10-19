@@ -77,7 +77,9 @@ export async function obtenerProductos() {
         console.warn("Firebase no disponible, se usa el catálogo inicial:", e);
     }
     base ||= Object.entries(productosData).map(([id, p]) => ({ id, ...p }));
-    cache = base.map(enriquecer);
+    // Orden natural por código (3D-002 antes que 3D-010)
+    cache = base.map(enriquecer).sort((a, b) =>
+        String(a.codigo || a.id).localeCompare(String(b.codigo || b.id), undefined, { numeric: true }));
     return cache;
 }
 
