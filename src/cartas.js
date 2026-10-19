@@ -72,9 +72,8 @@ function obtenerCartas(data) {
         ([id, producto]) => {
 
             return (
-                normalizarCategoria(
-                    producto.categoria
-                ) === "CARTAS"
+                [producto.categoria, ...Object.values(producto.categorias || {})]
+                    .some(c => normalizarCategoria(c) === "CARTAS")
             );
 
         }

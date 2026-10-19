@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Administración | Mi Tienda</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="admin">
+    <header>
+        <h1>Panel de administración</h1>
+        <nav>
+            <a href="index.html">← Ver tienda</a>
+            <a href="#" id="btn-salir" hidden>Cerrar sesión</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- LOGIN -->
+        <section id="login" class="admin-caja" hidden>
+            <h2>Ingresar</h2>
+            <input id="email" type="email" placeholder="Correo" autocomplete="username">
+            <input id="clave" type="password" placeholder="Contraseña" autocomplete="current-password">
+            <button id="btn-login" class="btn-comprar" type="button">Entrar</button>
+            <p id="login-msg" class="admin-msg"></p>
+        </section>
+
+        <!-- PANEL -->
+        <section id="panel" hidden>
+            <div class="admin-barra">
+                <input id="buscar" type="search" placeholder="Buscar por nombre o código">
+                <select id="filtro-cat">
+                    <option value="">Todas</option>
+                    <option value="3D">Impresiones 3D</option>
+                    <option value="TECNOLOGIA">Tecnología</option>
+                    <option value="CARTAS">Cartas</option>
+                </select>
+                <div class="admin-vistas" role="group" aria-label="Vista">
+                    <button type="button" class="btn-sec" data-vista="lista">☰ Lista</button>
+                    <button type="button" class="btn-sec" data-vista="iconos">▦ Iconos</button>
+                    <button type="button" class="btn-sec" data-vista="tienda">🛍️ Vista tienda</button>
+                </div>
+                <button id="btn-nuevo" class="btn-comprar" type="button">➕ Nuevo producto</button>
+                <button id="btn-importar" class="btn-sec" type="button">📥 Importar catálogo inicial</button>
+            </div>
+            <p id="estado" class="admin-msg"></p>
+            <div id="lista" class="admin-lista"></div>
+        </section>
+    </main>
+
+    <!-- FORMULARIO -->
+    <dialog id="dlg">
+        <form method="dialog" id="form" class="admin-form">
+            <h2 id="form-titulo">Producto</h2>
+
+            <div class="admin-campo">
+                <span>Código</span>
+                <div class="admin-url">
+                    <input id="f-codigo" placeholder="Escríbelo o genéralo">
+                    <button id="f-codigo-auto" class="btn-sec" type="button">🔢 Generar</button>
+                </div>
+            </div>
+            <label>Nombre <input id="f-nombre" required></label>
+            <div class="admin-campo">
+                <span>Categorías <small>(marca una o más; la primera define el prefijo del código)</small></span>
+                <div class="admin-cats">
+                    <label><input type="checkbox" class="f-cat" value="3D"> 🖨️ Impresiones 3D</label>
+                    <label><input type="checkbox" class="f-cat" value="TECNOLOGIA"> 💻 Tecnología</label>
+                    <label><input type="checkbox" class="f-cat" value="CARTAS"> 🃏 Cartas</label>
+                </div>
+            </div>
+            <label>Precio (CLP) <input id="f-precio" type="number" min="0" step="1" required></label>
+            <label>Descripción corta (se ve en la tarjeta) <input id="f-desc"></label>
+            <label>Descripción larga <textarea id="f-desc-larga" rows="4"></textarea></label>
+            <label>¿Para qué sirve? (un uso por línea) <textarea id="f-usos" rows="3"></textarea></label>
+            <label>Recomendaciones de uso <textarea id="f-reco" rows="3"></textarea></label>
+
+            <div>
+                <strong>Fotos</strong> <small>(la primera es la portada)</small>
+                <div id="f-fotos" class="admin-fotos"></div>
+                <input id="f-archivos" type="file" accept="image/*" multiple>
+                <div class="admin-url">
+                    <input id="f-url" type="url" placeholder="o pega la URL de una imagen">
+                    <button id="f-url-add" class="btn-sec" type="button">Agregar</button>
+                </div>
+                <p id="f-msg" class="admin-msg"></p>
+            </div>
+
+            <div class="admin-acciones">
+                <button id="f-guardar" class="btn-comprar" type="button">💾 Guardar</button>
+                <button id="f-cancelar" class="btn-sec" type="button">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script type="module" src="src/admin.js"></script>
+</body>
+</html>

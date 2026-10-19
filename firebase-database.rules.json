@@ -2,7 +2,7 @@
   "rules": {
     "productos": {
       ".read": true,
-      ".write": false
+      ".write": "auth != null && auth.uid === 'PEGA_AQUI_TU_UID'"
     }
   }
 }

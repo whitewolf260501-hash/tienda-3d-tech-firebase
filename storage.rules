@@ -1,0 +1,36 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Fotos de productos: las sube solo el administrador
+    match /productos/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+                            && request.auth.uid == 'PEGA_AQUI_TU_UID'
+                            && request.resource.size < 3 * 1024 * 1024
+                            && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null
+                    && request.auth.uid == 'PEGA_AQUI_TU_UID';
+    }
+
+    // Imágenes que suben los clientes en "diseño propio" (sesión anónima)
+    match /solicitudes/{archivo} {
+      allow get: if true;   // nombre aleatorio e imposible de adivinar
+      allow list, delete: if request.auth != null
+                          && request.auth.uid == 'PEGA_AQUI_TU_UID';
+      allow create: if request.auth != null
+                    && request.resource.size < 3 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+    }
+
+    // Archivos 3D que suben los clientes (STL, 3MF, OBJ, STEP...)
+    match /solicitudes-modelos/{archivo} {
+      allow get: if true;   // nombre aleatorio e imposible de adivinar
+      allow list, delete: if request.auth != null
+                          && request.auth.uid == 'PEGA_AQUI_TU_UID';
+      allow create: if request.auth != null
+                    && request.resource.size < 30 * 1024 * 1024
+                    && archivo.matches('.*\\.(stl|3mf|amf|obj|step|stp|ply|zip)');
+    }
+  }
+}

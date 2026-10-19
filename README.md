@@ -69,3 +69,24 @@ Ejemplo:
 El archivo `firebase-database.rules.json` deja la lectura pública y bloquea escrituras desde el navegador. Esto es apropiado para un catálogo donde los productos se administran desde Firebase Console.
 
 > La configuración web de Firebase contiene una API key pública; la seguridad real está en las reglas de Firebase, no en ocultar esa configuración.
+
+## Administración (`admin.html`)
+
+Panel para crear, editar y eliminar productos, precios, descripciones y fotos. Guarda en Firebase, así que los cambios los ven todos los clientes.
+
+Configuración (una sola vez), en [Firebase Console](https://console.firebase.google.com):
+
+1. **Authentication → Sign-in method:** activa *Correo electrónico/contraseña*.
+2. **Authentication → Users:** crea tu usuario y copia su **UID**.
+3. Pega ese UID en `firebase-database.rules.json` y `storage.rules` (reemplaza `PEGA_AQUI_TU_UID`) y publícalos en *Realtime Database → Reglas* y *Storage → Reglas*.
+4. **Storage:** actívalo (Firebase puede pedir el plan Blaze). Sin Storage también funciona pegando URLs de imágenes.
+5. Entra a `admin.html`, inicia sesión y usa **Importar catálogo inicial** una vez.
+
+### Imágenes en "diseño propio"
+
+Los clientes pueden subir hasta 3 imágenes de referencia (se guardan en `solicitudes/` de Storage y llegan como links en el WhatsApp o el correo). Para activarlo:
+
+1. **Authentication → Sign-in method:** activa el proveedor *Anónimo*.
+2. Publica `storage.rules` con tu UID (ya incluye las reglas de `solicitudes/`).
+3. Los archivos 3D (STL, 3MF, OBJ, STEP, PLY, AMF o ZIP, hasta 30 MB) quedan en `solicitudes-modelos/`.
+4. De vez en cuando borra los archivos viejos de `solicitudes/` y `solicitudes-modelos/` desde Storage.
