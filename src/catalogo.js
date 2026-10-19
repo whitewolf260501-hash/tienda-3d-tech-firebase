@@ -1,6 +1,6 @@
 // Catálogo compartido: productos + fotos + detalles + carrito
 import { productosData } from "./productos.js";
-import { detalles } from "./detalles.js";
+import { detalles, detallesCategoria } from "./detalles.js";
 import { db } from "./firebase.js";
 import { ref, get } from "firebase/database";
 
@@ -10,6 +10,15 @@ export const IMAGEN_DEFAULT = new URL("../assets/imagen no encontrada.jpg", impo
 const fotos = import.meta.glob("/assets/productos/*/*.{jpg,jpeg,png,webp,svg}", {
     eager: true, query: "?url", import: "default"
 });
+// Imagen genérica por categoría (assets/categorias/cartas.svg, ...) cuando el producto no tiene fotos
+const fotosCategoria = import.meta.glob("/assets/categorias/*.svg", {
+    eager: true, query: "?url", import: "default"
+});
+const porCategoria = {};
+Object.entries(fotosCategoria).forEach(([ruta, url]) => {
+    porCategoria[ruta.split("/").pop().replace(".svg", "").toUpperCase()] = url;
+});
+
 const fotosPorCodigo = {};
 Object.keys(fotos)
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
@@ -34,11 +43,13 @@ export function categoriasDe(p) {
 export const perteneceA = (p, cat) => categoriasDe(p).includes(cat);
 
 export function enriquecer(p) {
-    const d = detalles[p.codigo] || {};
+    const d = detalles[p.codigo] || detallesCategoria[categoriasDe(p)[0]] || {};
     const propias = [...(Array.isArray(p.imagenes) ? p.imagenes : []), p.urlImagen]
         .filter(i => i && String(i).trim());
     // Fotos del administrador primero; si no hay, las de assets/productos/<CODIGO>/
-    const imagenes = propias.length ? [...new Set(propias)] : (fotosPorCodigo[p.codigo] || []);
+    const deCategoria = categoriasDe(p).map(c => porCategoria[c]).filter(Boolean).slice(0, 1);
+    const imagenes = propias.length ? [...new Set(propias)]
+        : (fotosPorCodigo[p.codigo]?.length ? fotosPorCodigo[p.codigo] : deCategoria);
     const usos = Array.isArray(p.usos) && p.usos.length ? p.usos : (d.usos || []);
     return {
         ...p,

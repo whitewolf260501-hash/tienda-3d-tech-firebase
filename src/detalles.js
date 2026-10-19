@@ -31,3 +31,8 @@ export const detalles = {
   "TECH-019": { descripcionLarga: "Soporte de celular para auto con fijación firme a la rejilla de ventilación.", usos: ["Navegación con GPS", "Llamadas manos libres", "Viajes largos en carretera"], recomendaciones: "No bloquees tu campo visual al ubicarlo. Revisa que la fijación esté firme antes de partir." },
   "TECH-020": { descripcionLarga: "Disipador de aluminio con thermal pads para SSD M.2 NVMe.", usos: ["PC gamer", "Notebook compatible", "SSD NVMe de alto rendimiento"], recomendaciones: "Revisa que el espacio entre el SSD y la tapa permita el disipador. Retira el film protector de los thermal pads." }
 };
+
+// Texto por defecto para productos de una categoría sin texto propio
+export const detallesCategoria = {
+  CARTAS: { descripcionLarga: "Carta coleccionable de edición especial, con acabado de calidad pensada para coleccionistas, regalos y juegos de cartas.", usos: ["Coleccionismo", "Regalo para fans", "Juegos y exhibición"], recomendaciones: "Guárdala en un protector (sleeve) o carpeta para evitar dobleces. Mantenla lejos de la humedad y del sol directo." }
+};
