@@ -848,5 +848,7 @@ dialog::backdrop { background: rgba(0, 0, 0, .5); }
 
 /* Acceso discreto al panel admin */
 header h1 { user-select: none; -webkit-user-select: none; }
-.acceso-discreto { position: fixed; left: 0; bottom: 0; width: 32px; height: 32px; padding: 0; border: none;
-    background: transparent; opacity: 0; cursor: default; z-index: 5; -webkit-tap-highlight-color: transparent; user-select: none; }
+.acceso-tuerca { position: fixed; left: 8px; bottom: 8px; z-index: 5; width: 26px; height: 26px;
+    display: grid; place-items: center; font-size: 16px; line-height: 1; text-decoration: none;
+    color: #555; opacity: .14; border-radius: 50%; transition: opacity .2s; -webkit-tap-highlight-color: transparent; }
+.acceso-tuerca:hover, .acceso-tuerca:focus-visible { opacity: .85; }
