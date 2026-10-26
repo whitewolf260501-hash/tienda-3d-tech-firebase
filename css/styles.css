@@ -845,3 +845,8 @@ dialog::backdrop { background: rgba(0, 0, 0, .5); }
 .admin-tabla th, .admin-tabla td { padding: 4px; text-align: left; }
 .admin-tabla input { min-width: 80px; }
 .admin-zonas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .5rem; }
+
+/* Acceso discreto al panel admin */
+header h1 { user-select: none; -webkit-user-select: none; }
+.acceso-discreto { position: fixed; left: 0; bottom: 0; width: 32px; height: 32px; padding: 0; border: none;
+    background: transparent; opacity: 0; cursor: default; z-index: 5; -webkit-tap-highlight-color: transparent; user-select: none; }
