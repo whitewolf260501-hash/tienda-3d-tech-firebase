@@ -8,6 +8,7 @@ import { comprimir } from "./imagen.js";
 import { esc, precioCLP, normalizarCategoria, categoriasDe, enriquecer, IMAGEN_DEFAULT } from "./catalogo.js";
 import { crearTarjeta } from "./tarjeta.js";
 import { vigente, etiquetaOferta, totalLinea } from "./ofertas.js";
+import { idDeEnlace, urlDeArchivoDrive, convertirEnlaceDrive, listarImagenes, CARPETA_POR_DEFECTO } from "./drive.js";
 import { COURIERS, TRAMOS, ZONAS, ENVIOS_DEFECTO, cargarConfigEnvios, limpiarCacheEnvios } from "./envios.js";
 
 const $ = (id) => document.getElementById(id);
@@ -213,7 +214,7 @@ $("f-fotos").addEventListener("click", (e) => {
 $("f-url-add").addEventListener("click", () => {
     const u = $("f-url").value.trim();
     if (!u) return;
-    editando.imagenes.push(u);
+    editando.imagenes.push(convertirEnlaceDrive(u));
     $("f-url").value = "";
     pintarFotos();
 });
@@ -473,4 +474,82 @@ $("e-guardar").addEventListener("click", async () => {
             ? "Sin permiso: publica las reglas nuevas de Realtime Database (incluyen «config»)."
             : "No se pudo guardar: " + e.message;
     }
+});
+
+
+// ---------- Google Drive (biblioteca de fotos) ----------
+let driveCfg = {};
+let driveFotos = [];
+const driveSel = new Set();
+
+async function cargarCfgDrive() {
+    try { driveCfg = (await get(ref(db, "config/drive"))).val() || {}; } catch { driveCfg = {}; }
+    return driveCfg;
+}
+
+function pintarDrive() {
+    const q = $("d-buscar").value.trim().toLowerCase();
+    const lista = driveFotos.filter(f => !q || f.name.toLowerCase().includes(q));
+    $("d-grid").innerHTML = lista.map(f => `
+        <label class="drive-item">
+            <input type="checkbox" data-id="${esc(f.id)}" ${driveSel.has(f.id) ? "checked" : ""}>
+            <img src="${esc(urlDeArchivoDrive(f.id, 240))}" alt="" loading="lazy">
+            <span>${esc(f.name)}</span>
+        </label>`).join("");
+    $("d-agregar").textContent = driveSel.size ? `Agregar ${driveSel.size} seleccionada(s)` : "Agregar seleccionadas";
+}
+
+async function refrescarDrive() {
+    const key = $("d-key").value.trim(), carpeta = idDeEnlace($("d-carpeta").value);
+    if (!key || !carpeta) { $("d-msg").textContent = "Completa la clave de API y la carpeta en «Configuración»."; return; }
+    $("d-msg").textContent = "Leyendo la carpeta de Drive...";
+    try {
+        driveFotos = await listarImagenes(key, carpeta);
+        $("d-msg").textContent = driveFotos.length ? `${driveFotos.length} imágenes en la carpeta.` : "No hay imágenes en esa carpeta (o no está compartida con «cualquiera con el enlace»).";
+        pintarDrive();
+    } catch (e) {
+        $("d-msg").textContent = "No se pudo leer Drive: " + e.message;
+    }
+}
+
+$("f-drive").addEventListener("click", async () => {
+    driveSel.clear();
+    $("dlg-drive").showModal();
+    $("d-msg").textContent = "Cargando...";
+    const c = await cargarCfgDrive();
+    $("d-key").value = c.apiKey || "";
+    $("d-carpeta").value = c.carpetaId || CARPETA_POR_DEFECTO;
+    if (c.apiKey) await refrescarDrive();
+    else {
+        $("d-msg").textContent = "Primero guarda tu clave de API en «Configuración».";
+        document.querySelector("#dlg-drive details").open = true;
+    }
+});
+
+$("d-guardar").addEventListener("click", async () => {
+    const cfg = { apiKey: $("d-key").value.trim(), carpetaId: idDeEnlace($("d-carpeta").value) || CARPETA_POR_DEFECTO };
+    try {
+        await set(ref(db, "config/drive"), cfg);
+        driveCfg = cfg;
+        await refrescarDrive();
+    } catch (e) {
+        $("d-msg").textContent = "No se pudo guardar: " + e.message;
+    }
+});
+
+$("d-actualizar").addEventListener("click", refrescarDrive);
+$("d-buscar").addEventListener("input", pintarDrive);
+$("d-grid").addEventListener("change", (e) => {
+    const id = e.target.dataset?.id;
+    if (!id) return;
+    e.target.checked ? driveSel.add(id) : driveSel.delete(id);
+    pintarDrive();
+});
+$("d-cerrar").addEventListener("click", () => $("dlg-drive").close());
+$("d-agregar").addEventListener("click", () => {
+    driveSel.forEach(id => editando.imagenes.push(urlDeArchivoDrive(id, 1000)));
+    driveSel.clear();
+    pintarFotos();
+    $("f-msg").textContent = "Fotos de Drive agregadas. Recuerda pulsar Guardar.";
+    $("dlg-drive").close();
 });

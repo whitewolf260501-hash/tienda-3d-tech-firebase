@@ -5,8 +5,9 @@
       ".write": "auth != null && auth.uid === 'PEGA_AQUI_TU_UID'"
     },
     "config": {
-      ".read": true,
-      ".write": "auth != null && auth.uid === 'PEGA_AQUI_TU_UID'"
+      ".write": "auth != null && auth.uid === 'PEGA_AQUI_TU_UID'",
+      "envios": { ".read": true },
+      "drive": { ".read": "auth != null && auth.uid === 'PEGA_AQUI_TU_UID'" }
     }
   }
 }

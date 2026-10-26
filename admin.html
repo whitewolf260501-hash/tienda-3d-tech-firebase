@@ -81,7 +81,10 @@
             <div>
                 <strong>Fotos</strong> <small>(la primera es la portada)</small>
                 <div id="f-fotos" class="admin-fotos"></div>
-                <input id="f-archivos" type="file" accept="image/*" multiple>
+                <div class="admin-url">
+                    <input id="f-archivos" type="file" accept="image/*" multiple>
+                    <button id="f-drive" class="btn-sec" type="button">📁 Elegir de Google Drive</button>
+                </div>
                 <div class="admin-url">
                     <input id="f-url" type="url" placeholder="o pega la URL de una imagen">
                     <button id="f-url-add" class="btn-sec" type="button">Agregar</button>
@@ -92,6 +95,30 @@
             <div class="admin-acciones">
                 <button id="f-guardar" class="btn-comprar" type="button">💾 Guardar</button>
                 <button id="f-cancelar" class="btn-sec" type="button">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- GOOGLE DRIVE -->
+    <dialog id="dlg-drive">
+        <form method="dialog" class="admin-form">
+            <h2>📁 Fotos desde Google Drive</h2>
+            <details>
+                <summary>Configuración (solo la primera vez)</summary>
+                <label>Clave de API de Google (Drive API)<input id="d-key" placeholder="AIza..."></label>
+                <label>Carpeta de Drive (enlace o ID)<input id="d-carpeta"></label>
+                <button id="d-guardar" class="btn-sec" type="button">Guardar configuración</button>
+                <p class="admin-msg">La carpeta debe estar compartida como «cualquiera con el enlace». La clave se crea en Google Cloud Console → Credenciales → Crear clave de API, activando «Google Drive API» y restringiéndola a tu sitio.</p>
+            </details>
+            <div class="admin-url">
+                <input id="d-buscar" type="search" placeholder="Buscar por nombre de archivo">
+                <button id="d-actualizar" class="btn-sec" type="button">↻ Actualizar</button>
+            </div>
+            <p id="d-msg" class="admin-msg"></p>
+            <div id="d-grid" class="drive-grid"></div>
+            <div class="admin-acciones">
+                <button id="d-agregar" class="btn-comprar" type="button">Agregar seleccionadas</button>
+                <button id="d-cerrar" class="btn-sec" type="button">Cerrar</button>
             </div>
         </form>
     </dialog>

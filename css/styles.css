@@ -852,3 +852,17 @@ header h1 { user-select: none; -webkit-user-select: none; }
     display: grid; place-items: center; font-size: 16px; line-height: 1; text-decoration: none;
     color: #555; opacity: .14; border-radius: 50%; transition: opacity .2s; -webkit-tap-highlight-color: transparent; }
 .acceso-tuerca:hover, .acceso-tuerca:focus-visible { opacity: .85; }
+
+/* ============================================================
+   GOOGLE DRIVE (selector de fotos)
+   ============================================================ */
+#dlg-drive { width: min(760px, 96vw); }
+.drive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: .5rem;
+    max-height: 48vh; overflow-y: auto; }
+.drive-item { position: relative; display: flex; flex-direction: column; gap: 2px; font-size: .7rem; cursor: pointer;
+    border: 2px solid transparent; border-radius: 8px; padding: 2px; }
+.drive-item img { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; background: #eee; }
+.drive-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.drive-item input { position: absolute; top: 6px; left: 6px; width: 18px; height: 18px; }
+.drive-item:has(input:checked) { border-color: #f97316; }
+details summary { cursor: pointer; font-weight: 600; margin-bottom: .5rem; }
