@@ -85,6 +85,9 @@
                     <input id="f-archivos" type="file" accept="image/*" multiple>
                     <button id="f-drive" class="btn-sec" type="button">📁 Elegir de Google Drive</button>
                 </div>
+                <label id="f-destino-caja" class="admin-check" hidden>
+                    <input id="f-destino-drive" type="checkbox"> <span>Guardar las fotos nuevas en mi Google Drive (en vez de Firebase)</span>
+                </label>
                 <div class="admin-url">
                     <input id="f-url" type="url" placeholder="o pega la URL de una imagen">
                     <button id="f-url-add" class="btn-sec" type="button">Agregar</button>
@@ -105,10 +108,11 @@
             <h2>📁 Fotos desde Google Drive</h2>
             <details>
                 <summary>Configuración (solo la primera vez)</summary>
-                <label>Clave de API de Google (Drive API)<input id="d-key" placeholder="AIza..."></label>
+                <label>ID de cliente OAuth (para SUBIR fotos a Drive)<input id="d-cliente" placeholder="123456789-abc.apps.googleusercontent.com"></label>
+                <label>Clave de API de Google (solo para listar sin iniciar sesión, opcional)<input id="d-key" placeholder="AIza..."></label>
                 <label>Carpeta de Drive (enlace o ID)<input id="d-carpeta"></label>
                 <button id="d-guardar" class="btn-sec" type="button">Guardar configuración</button>
-                <p class="admin-msg">La carpeta debe estar compartida como «cualquiera con el enlace». La clave se crea en Google Cloud Console → Credenciales → Crear clave de API, activando «Google Drive API» y restringiéndola a tu sitio.</p>
+                <p class="admin-msg">La carpeta debe estar compartida como «cualquiera con el enlace». En Google Cloud Console activa «Google Drive API» y crea un «ID de cliente de OAuth» (aplicación web) con tu sitio como origen autorizado. La clave de API es opcional.</p>
             </details>
             <div class="admin-url">
                 <input id="d-buscar" type="search" placeholder="Buscar por nombre de archivo">

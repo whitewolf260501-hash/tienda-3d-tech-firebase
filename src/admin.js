@@ -8,7 +8,7 @@ import { comprimir } from "./imagen.js";
 import { esc, precioCLP, normalizarCategoria, categoriasDe, enriquecer, IMAGEN_DEFAULT } from "./catalogo.js";
 import { crearTarjeta } from "./tarjeta.js";
 import { vigente, etiquetaOferta, totalLinea } from "./ofertas.js";
-import { idDeEnlace, urlDeArchivoDrive, convertirEnlaceDrive, listarImagenes, CARPETA_POR_DEFECTO } from "./drive.js";
+import { idDeEnlace, urlDeArchivoDrive, convertirEnlaceDrive, listarImagenes, CARPETA_POR_DEFECTO, conectarDrive, tokenDrive, subirADrive, cargarGIS } from "./drive.js";
 import { COURIERS, TRAMOS, ZONAS, ENVIOS_DEFECTO, cargarConfigEnvios, limpiarCacheEnvios } from "./envios.js";
 
 const $ = (id) => document.getElementById(id);
@@ -22,7 +22,11 @@ onAuthStateChanged(auth, (usuario) => {
     $("login").hidden = !!user;
     $("panel").hidden = !user;
     $("btn-salir").hidden = !user;
-    if (user) cargar();
+    if (user) {
+        cargar();
+        cargarCfgDrive().then(actualizarDestinoDrive);
+        cargarGIS().catch(() => {});
+    }
 });
 
 $("btn-login").addEventListener("click", async () => {
@@ -226,6 +230,14 @@ $("f-archivos").addEventListener("change", async (e) => {
     const carpeta = ($("f-codigo").value.trim() || "sin-codigo").replace(/[^\w-]/g, "_");
 
     // Sube varias fotos a la vez (4 en paralelo) y las agrega en el mismo orden en que se eligieron
+    // ¿Destino Google Drive? (hay que haberse conectado antes con el checkbox)
+    const aDrive = $("f-destino-drive").checked && !$("f-destino-caja").hidden;
+    if (aDrive && !tokenDrive()) {
+        $("f-msg").textContent = "La sesión de Google venció. Desmarca y vuelve a marcar «Guardar en Google Drive» para reconectar.";
+        return;
+    }
+    const carpetaDrive = idDeEnlace(driveCfg.carpetaId) || CARPETA_POR_DEFECTO;
+
     const resultados = new Array(archivos.length);
     let siguiente = 0, hechas = 0, enOrden = 0, error = null;
 
@@ -240,9 +252,14 @@ $("f-archivos").addEventListener("change", async (e) => {
             if (i >= archivos.length) return;
             try {
                 const blob = await comprimir(archivos[i]);
-                const r = sRef(storage, `productos/${carpeta}/${Date.now()}_${i}.jpg`);
-                await uploadBytes(r, blob, { contentType: "image/jpeg" });
-                resultados[i] = await getDownloadURL(r);
+                if (aDrive) {
+                    const id = await subirADrive(carpetaDrive, blob, `${carpeta}_${Date.now()}_${i}.jpg`);
+                    resultados[i] = urlDeArchivoDrive(id, 1000);
+                } else {
+                    const r = sRef(storage, `productos/${carpeta}/${Date.now()}_${i}.jpg`);
+                    await uploadBytes(r, blob, { contentType: "image/jpeg" });
+                    resultados[i] = await getDownloadURL(r);
+                }
                 hechas++;
                 $("f-msg").textContent = `Subidas ${hechas} de ${archivos.length}...`;
                 volcar();
@@ -257,7 +274,7 @@ $("f-archivos").addEventListener("change", async (e) => {
     for (let i = enOrden; i < archivos.length; i++) if (resultados[i]) editando.imagenes.push(resultados[i]);
     pintarFotos();
     $("f-msg").textContent = error
-        ? `Una foto no se pudo subir (${error.message}). Revisa Storage y sus reglas, o usa Google Drive.`
+        ? `Una foto no se pudo subir (${error.message}). Revisa Storage/Drive y su configuración.`
         : "Fotos subidas. Recuerda pulsar Guardar.";
 });
 
@@ -520,11 +537,13 @@ function pintarDrive() {
 }
 
 async function refrescarDrive() {
-    const key = $("d-key").value.trim(), carpeta = idDeEnlace($("d-carpeta").value);
-    if (!key || !carpeta) { $("d-msg").textContent = "Completa la clave de API y la carpeta en «Configuración»."; return; }
+    const key = $("d-key").value.trim(), carpeta = idDeEnlace($("d-carpeta").value), cliente = $("d-cliente").value.trim();
+    if (!carpeta || (!key && !cliente)) { $("d-msg").textContent = "Completa la carpeta y el ID de cliente (o la clave de API) en «Configuración»."; return; }
     $("d-msg").textContent = "Leyendo la carpeta de Drive...";
     try {
-        driveFotos = await listarImagenes(key, carpeta);
+        let tk = tokenDrive();
+        if (!tk && !key) tk = await conectarDrive(cliente);
+        driveFotos = await listarImagenes(key, carpeta, tk);
         $("d-msg").textContent = driveFotos.length ? `${driveFotos.length} imágenes en la carpeta.` : "No hay imágenes en esa carpeta (o no está compartida con «cualquiera con el enlace»).";
         pintarDrive();
     } catch (e) {
@@ -538,19 +557,21 @@ $("f-drive").addEventListener("click", async () => {
     $("d-msg").textContent = "Cargando...";
     const c = await cargarCfgDrive();
     $("d-key").value = c.apiKey || "";
+    $("d-cliente").value = c.clientId || "";
     $("d-carpeta").value = c.carpetaId || CARPETA_POR_DEFECTO;
-    if (c.apiKey) await refrescarDrive();
+    if (c.apiKey || c.clientId) await refrescarDrive();
     else {
-        $("d-msg").textContent = "Primero guarda tu clave de API en «Configuración».";
+        $("d-msg").textContent = "Primero guarda tu ID de cliente (o clave de API) en «Configuración».";
         document.querySelector("#dlg-drive details").open = true;
     }
 });
 
 $("d-guardar").addEventListener("click", async () => {
-    const cfg = { apiKey: $("d-key").value.trim(), carpetaId: idDeEnlace($("d-carpeta").value) || CARPETA_POR_DEFECTO };
+    const cfg = { apiKey: $("d-key").value.trim(), clientId: $("d-cliente").value.trim(), carpetaId: idDeEnlace($("d-carpeta").value) || CARPETA_POR_DEFECTO };
     try {
         await set(ref(db, "config/drive"), cfg);
         driveCfg = cfg;
+        actualizarDestinoDrive();
         await refrescarDrive();
     } catch (e) {
         $("d-msg").textContent = "No se pudo guardar: " + e.message;
@@ -572,4 +593,23 @@ $("d-agregar").addEventListener("click", () => {
     pintarFotos();
     $("f-msg").textContent = "Fotos de Drive agregadas. Recuerda pulsar Guardar.";
     $("dlg-drive").close();
+});
+
+
+// ---------- Subir fotos directo a Google Drive ----------
+function actualizarDestinoDrive() {
+    $("f-destino-caja").hidden = !driveCfg.clientId;
+}
+
+// Al marcar la casilla se abre la ventana de Google (necesita un clic del usuario)
+$("f-destino-drive").addEventListener("change", async (e) => {
+    if (!e.target.checked) return;
+    $("f-msg").textContent = "Conectando con Google...";
+    try {
+        await conectarDrive(driveCfg.clientId);
+        $("f-msg").textContent = "Conectado a Google Drive. Las fotos nuevas se guardarán en tu carpeta.";
+    } catch (err) {
+        e.target.checked = false;
+        $("f-msg").textContent = "No se pudo conectar con Google: " + err.message;
+    }
 });
