@@ -1,6 +1,7 @@
 // Tarjeta de producto: carrusel + ventana flotante (hover) + clic a la página del producto
 import { esc, precioCLP, agregarAlCarrito } from "./catalogo.js";
 import { carruselHTML, activarCarrusel } from "./carrusel.js";
+import { precioHTML, badgeOferta } from "./ofertas.js";
 
 const hayHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 let popup = null, detenerPopup = null, timerAbrir = null;
@@ -20,7 +21,7 @@ function mostrarPopup(producto, tarjeta, esAdmin) {
         ${carruselHTML(producto.imagenes, producto.nombre)}
         <h4>${esc(producto.nombre)}</h4>
         <p>${esc(producto.descripcionLarga)}</p>
-        <strong>$${precioCLP(producto.precio)}</strong>
+        <strong>${precioHTML(producto)}</strong> ${badgeOferta(producto)}
         <small>${esAdmin ? "Haz clic para editar" : "Haz clic para ver más detalles"}</small>`;
     detenerPopup?.();
     detenerPopup = activarCarrusel(p, 1800);
@@ -47,6 +48,7 @@ export function crearTarjeta(producto, opciones = {}) {
     const t = document.createElement("article");
     t.className = "tarjeta-producto tarjeta-clicable";
     t.innerHTML = `
+        ${badgeOferta(producto)}
         <div class="producto-contenido">
             <span class="codigo-producto">Cód: ${esc(producto.codigo || producto.id)}</span>
             <h3 class="nombre-producto">${esc(producto.nombre)}</h3>
@@ -54,10 +56,11 @@ export function crearTarjeta(producto, opciones = {}) {
             <p class="descripcion-producto">${esc(producto.descripcion)}</p>
         </div>
         <div class="producto-footer">
-            <p class="precio">$${precioCLP(producto.precio)}</p>
+            <p class="precio">${precioHTML(producto)}</p>
             ${opciones.admin
                 ? `<div class="acciones-admin">
                        <button class="btn-sec" type="button" data-accion="editar">✏️ Editar</button>
+                       <button class="btn-sec" type="button" data-accion="oferta">🏷️ Oferta</button>
                        <button class="btn-peligro" type="button" data-accion="borrar">🗑️ Eliminar</button>
                    </div>`
                 : `<button class="btn-comprar" type="button">🛒 Añadir al carrito</button>`}
@@ -67,6 +70,9 @@ export function crearTarjeta(producto, opciones = {}) {
 
     t.querySelector('[data-accion="editar"]')?.addEventListener("click", (e) => {
         e.stopPropagation(); ocultarPopup(); opciones.onEditar?.();
+    });
+    t.querySelector('[data-accion="oferta"]')?.addEventListener("click", (e) => {
+        e.stopPropagation(); ocultarPopup(); opciones.onOferta?.();
     });
     t.querySelector('[data-accion="borrar"]')?.addEventListener("click", (e) => {
         e.stopPropagation(); ocultarPopup(); opciones.onBorrar?.();

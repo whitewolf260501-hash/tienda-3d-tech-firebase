@@ -2,6 +2,7 @@
 import { productosData } from "./productos.js";
 import { detalles, detallesCategoria } from "./detalles.js";
 import { db } from "./firebase.js";
+import { vigente } from "./ofertas.js";
 import { ref, get } from "firebase/database";
 
 export const IMAGEN_DEFAULT = new URL("../assets/imagen no encontrada.jpg", import.meta.url).href;
@@ -91,7 +92,7 @@ export function agregarAlCarrito(p) {
     const carrito = JSON.parse(localStorage.getItem("carrito3d")) || [];
     const existente = carrito.find(i => i.id === p.id);
     if (existente) existente.cantidad++;
-    else carrito.push({ id: p.id, nombre: p.nombre, precio: Number(p.precio), imagen: p.imagenes[0], cantidad: 1 });
+    else carrito.push({ id: p.id, nombre: p.nombre, precio: Number(p.precio), imagen: p.imagenes[0], cantidad: 1, peso: Number(p.peso) || 0, oferta: vigente(p.oferta) ? p.oferta : null });
     localStorage.setItem("carrito3d", JSON.stringify(carrito));
     actualizarContadorCarrito();
 }

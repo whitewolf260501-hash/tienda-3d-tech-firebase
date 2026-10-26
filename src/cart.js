@@ -1,4 +1,6 @@
 import emailjs from '@emailjs/browser';
+import { totalLinea, vigente, etiquetaOferta } from "./ofertas.js";
+import { pintarEnvio, resumenEnvio } from "./carritoEnvio.js";
 
 const contenedorCarrito = document.getElementById("contenedor-carrito");
 const seccionCheckout = document.getElementById("seccion-checkout");
@@ -121,7 +123,7 @@ function cargarCarrito() {
         const cantidad = Number(item.cantidad) || 1;
         const precio = Number(item.precio) || 0;
 
-        const subtotal = precio * cantidad;
+        const subtotal = totalLinea(precio, cantidad, item.oferta);
 
         totalGeneral += subtotal;
 
@@ -148,6 +150,7 @@ function cargarCarrito() {
                 <td style="padding: 12px;">
 
                     $${precio.toLocaleString("es-CL")}
+                    ${vigente(item.oferta) ? `<div style="color:#16a34a;font-size:.8rem;">🏷️ ${etiquetaOferta(item.oferta)}</div>` : ""}
 
                 </td>
 
@@ -311,6 +314,8 @@ function cargarCarrito() {
 
 
     contenedorCarrito.innerHTML = tablaHtml;
+
+    pintarEnvio(contenedorCarrito);
 
 
     activarBotonesCantidad();
@@ -547,19 +552,28 @@ function obtenerDatosYDetalle() {
             Number(item.cantidad) || 0;
 
         const sub =
-            precio * cantidad;
+            totalLinea(precio, cantidad, item.oferta);
 
 
         total += sub;
 
 
         detalle +=
-            `- ${item.nombre} (x${cantidad}) - Subtotal: $${sub.toLocaleString("es-CL")}\n`;
+            `- ${item.nombre} (x${cantidad})${vigente(item.oferta) ? ` [Oferta ${etiquetaOferta(item.oferta)}]` : ""} - Subtotal: $${sub.toLocaleString("es-CL")}\n`;
     });
 
 
     detalle +=
-        `\nTOTAL GENERAL: $${total.toLocaleString("es-CL")}`;
+        `\nTOTAL PRODUCTOS: $${total.toLocaleString("es-CL")}`;
+
+    const envio = resumenEnvio();
+
+    if (envio.error) {
+        alert(envio.error);
+        return null;
+    }
+
+    detalle += `\n${envio.linea}`;
 
 
     return {

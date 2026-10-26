@@ -41,6 +41,7 @@
                     <button type="button" class="btn-sec" data-vista="iconos">▦ Iconos</button>
                     <button type="button" class="btn-sec" data-vista="tienda">🛍️ Vista tienda</button>
                 </div>
+                <button id="btn-envios" class="btn-sec" type="button">🚚 Envíos</button>
                 <button id="btn-nuevo" class="btn-comprar" type="button">➕ Nuevo producto</button>
                 <button id="btn-importar" class="btn-sec" type="button">📥 Importar catálogo inicial</button>
             </div>
@@ -71,6 +72,7 @@
                 </div>
             </div>
             <label>Precio (CLP) <input id="f-precio" type="number" min="0" step="1" required></label>
+            <label>Peso por unidad en kg (opcional, para calcular el envío) <input id="f-peso" type="number" min="0" step="0.05" placeholder="Ej: 0.3"></label>
             <label>Descripción corta (se ve en la tarjeta) <input id="f-desc"></label>
             <label>Descripción larga <textarea id="f-desc-larga" rows="4"></textarea></label>
             <label>¿Para qué sirve? (un uso por línea) <textarea id="f-usos" rows="3"></textarea></label>
@@ -90,6 +92,69 @@
             <div class="admin-acciones">
                 <button id="f-guardar" class="btn-comprar" type="button">💾 Guardar</button>
                 <button id="f-cancelar" class="btn-sec" type="button">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- ENVÍOS -->
+    <dialog id="dlg-envios">
+        <form method="dialog" class="admin-form">
+            <h2>🚚 Envíos</h2>
+            <p class="admin-msg">Valores <strong>referenciales</strong> (zona Centro, tipo Santiago → Valparaíso). Ajústalos con el cotizador oficial de cada courier:
+                <a href="https://www.correos.cl" target="_blank" rel="noopener">Correos de Chile</a> ·
+                <a href="https://www.starken.cl" target="_blank" rel="noopener">Starken</a> ·
+                <a href="https://www.blue.cl" target="_blank" rel="noopener">Blue Express</a> ·
+                <a href="https://www.chilexpress.cl" target="_blank" rel="noopener">Chilexpress</a></p>
+            <strong>Precio base por tramo de peso (CLP)</strong>
+            <div id="e-tabla" class="admin-scroll"></div>
+            <strong>Multiplicador por zona (1 = zona Centro)</strong>
+            <div id="e-zonas" class="admin-zonas"></div>
+            <label>Peso por unidad si el producto no tiene peso (kg)<input id="e-peso" type="number" min="0.05" step="0.05"></label>
+            <label class="admin-check"><input id="e-retiro" type="checkbox"> <span>Ofrecer retiro en persona (sin costo)</span></label>
+            <label class="admin-check"><input id="e-porpagar" type="checkbox"> <span>Ofrecer envío por pagar (el cliente paga al recibir)</span></label>
+            <p id="e-msg" class="admin-msg"></p>
+            <div class="admin-acciones">
+                <button id="e-guardar" class="btn-comprar" type="button">💾 Guardar</button>
+                <button id="e-restaurar" class="btn-sec" type="button">Valores de referencia</button>
+                <button id="e-cancelar" class="btn-sec" type="button">Cerrar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- OFERTA RÁPIDA -->
+    <dialog id="dlg-oferta">
+        <form method="dialog" class="admin-form">
+            <h2>🏷️ Oferta</h2>
+            <p id="o-titulo" class="admin-msg"></p>
+
+            <div class="admin-chips">
+                <button type="button" class="btn-sec" data-preset='{"tipo":"nxm","n":2,"m":1}'>2x1</button>
+                <button type="button" class="btn-sec" data-preset='{"tipo":"nxm","n":3,"m":2}'>3x2</button>
+                <button type="button" class="btn-sec" data-preset='{"tipo":"porcentaje","valor":10}'>10%</button>
+                <button type="button" class="btn-sec" data-preset='{"tipo":"porcentaje","valor":20}'>20%</button>
+                <button type="button" class="btn-sec" data-preset='{"tipo":"porcentaje","valor":30}'>30%</button>
+            </div>
+
+            <label>Tipo de oferta
+                <select id="o-tipo">
+                    <option value="porcentaje">Descuento en %</option>
+                    <option value="precio">Precio oferta (nuevo precio)</option>
+                    <option value="nxm">Llevas N y pagas M (2x1, 3x2...)</option>
+                    <option value="pack">Pack: N unidades por un precio</option>
+                </select>
+            </label>
+            <label id="o-valor-caja"><span id="o-valor-label"></span><input id="o-valor" type="number" min="1" step="1"></label>
+            <label id="o-n-caja">Llevas (N unidades)<input id="o-n" type="number" min="2" step="1" value="2"></label>
+            <label id="o-m-caja">Pagas (M unidades)<input id="o-m" type="number" min="1" step="1" value="1"></label>
+            <label>Desde (opcional)<input id="o-desde" type="date"></label>
+            <label>Hasta (opcional)<input id="o-hasta" type="date"></label>
+            <label class="admin-check"><input id="o-todos" type="checkbox"> <span id="o-todos-txt"></span></label>
+
+            <p id="o-prev" class="admin-msg"></p>
+            <div class="admin-acciones">
+                <button id="o-guardar" class="btn-comprar" type="button">💾 Guardar oferta</button>
+                <button id="o-quitar" class="btn-peligro" type="button">Quitar oferta</button>
+                <button id="o-cancelar" class="btn-sec" type="button">Cancelar</button>
             </div>
         </form>
     </dialog>

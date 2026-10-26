@@ -3,6 +3,7 @@ import { obtenerProducto, obtenerProductos, categoriasDe, esc, precioCLP,
          agregarAlCarrito, actualizarContadorCarrito } from "./catalogo.js";
 import { carruselHTML, activarCarrusel } from "./carrusel.js";
 import { abrirSolicitudDiseno } from "./diseno.js";
+import { vigente, precioHTML, badgeOferta, descripcionOferta } from "./ofertas.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     actualizarContadorCarrito();
@@ -28,7 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="detalle-info">
                 <span class="codigo-producto">Cód: ${esc(p.codigo || p.id)}</span>
                 <h2>${esc(p.nombre)}</h2>
-                <p class="precio">$${precioCLP(p.precio)}</p>
+                <p class="precio">${precioHTML(p)} ${badgeOferta(p)}</p>
+                ${vigente(p.oferta) ? `<p class="oferta-detalle">🏷️ ${esc(descripcionOferta(p.oferta))}</p>` : ""}
                 <p>${esc(p.descripcionLarga)}</p>
                 ${p.usos.length ? `<h3>¿Para qué puedes usarlo?</h3>
                     <ul>${p.usos.map(u => `<li>${esc(u)}</li>`).join("")}</ul>` : ""}
@@ -58,6 +60,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("relacionados").innerHTML = otros.map(o => `
         <a class="relacionado" href="producto.html?id=${encodeURIComponent(o.id)}">
             <img src="${esc(o.imagenes[0])}" alt="${esc(o.nombre)}" loading="lazy">
-            <span>${esc(o.nombre)}</span><strong>$${precioCLP(o.precio)}</strong>
+            <span>${esc(o.nombre)}</span><strong>${precioHTML(o)}</strong>
         </a>`).join("");
 });
