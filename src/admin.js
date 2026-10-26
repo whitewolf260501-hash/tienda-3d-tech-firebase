@@ -221,24 +221,44 @@ $("f-url-add").addEventListener("click", () => {
 
 $("f-archivos").addEventListener("change", async (e) => {
     const archivos = [...e.target.files];
-    const carpeta = ($("f-codigo").value.trim() || "sin-codigo").replace(/[^\w-]/g, "_");
-    for (const [n, a] of archivos.entries()) {
-        $("f-msg").textContent = `Subiendo foto ${n + 1} de ${archivos.length}...`;
-        try {
-            const blob = await comprimir(a);
-            const r = sRef(storage, `productos/${carpeta}/${Date.now()}_${n}.jpg`);
-            await uploadBytes(r, blob, { contentType: "image/jpeg" });
-            editando.imagenes.push(await getDownloadURL(r));
-            pintarFotos();
-        } catch (err) {
-            $("f-msg").textContent = "No se pudo subir la foto (" + err.message +
-                "). Revisa Storage y sus reglas, o pega una URL.";
-            e.target.value = "";
-            return;
-        }
-    }
-    $("f-msg").textContent = "Fotos subidas. Recuerda pulsar Guardar.";
     e.target.value = "";
+    if (!archivos.length) return;
+    const carpeta = ($("f-codigo").value.trim() || "sin-codigo").replace(/[^\w-]/g, "_");
+
+    // Sube varias fotos a la vez (4 en paralelo) y las agrega en el mismo orden en que se eligieron
+    const resultados = new Array(archivos.length);
+    let siguiente = 0, hechas = 0, enOrden = 0, error = null;
+
+    const volcar = () => {
+        while (enOrden < archivos.length && resultados[enOrden]) editando.imagenes.push(resultados[enOrden++]);
+        pintarFotos();
+    };
+
+    const trabajador = async () => {
+        while (!error) {
+            const i = siguiente++;
+            if (i >= archivos.length) return;
+            try {
+                const blob = await comprimir(archivos[i]);
+                const r = sRef(storage, `productos/${carpeta}/${Date.now()}_${i}.jpg`);
+                await uploadBytes(r, blob, { contentType: "image/jpeg" });
+                resultados[i] = await getDownloadURL(r);
+                hechas++;
+                $("f-msg").textContent = `Subidas ${hechas} de ${archivos.length}...`;
+                volcar();
+            } catch (err) { error = err; }
+        }
+    };
+
+    $("f-msg").textContent = `Subiendo ${archivos.length} foto(s)...`;
+    await Promise.all(Array.from({ length: Math.min(4, archivos.length) }, trabajador));
+
+    // Si una falló, conserva igualmente las que sí se subieron
+    for (let i = enOrden; i < archivos.length; i++) if (resultados[i]) editando.imagenes.push(resultados[i]);
+    pintarFotos();
+    $("f-msg").textContent = error
+        ? `Una foto no se pudo subir (${error.message}). Revisa Storage y sus reglas, o usa Google Drive.`
+        : "Fotos subidas. Recuerda pulsar Guardar.";
 });
 
 $("f-cancelar").addEventListener("click", () => $("dlg").close());
